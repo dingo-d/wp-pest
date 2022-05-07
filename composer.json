@@ -1,19 +1,35 @@
 {
 	"name": "dingo-d/wp-pest-integration-test-setup",
 	"description": "A package that will add WordPress integration test suite with Pest framework",
-	"type": "library",
+	"keywords": [
+		"php",
+		"framework",
+		"pest",
+		"wordpress",
+		"integration",
+		"test",
+		"testing"
+	],
 	"license": "MIT",
+	"authors": [
+		{
+			"name": "Denis Žoljom",
+			"email": "denis.zoljom@gmail.com"
+		}
+	],
 	"require": {
 		"php": "^7.4 || <8.0",
 		"pestphp/pest": "^1.2",
 		"aaemnnosttv/wp-sqlite-db": "^1.2",
-		"koodimonni/composer-dropin-installer": "^1.4",
-		"mnsami/composer-custom-directory-installer": "^2.0",
 		"yoast/phpunit-polyfills": "^1.0",
 		"yoast/wp-test-utils": "^1.0"
 	},
 	"require-dev": {
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.7"
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+		"phpstan/phpstan": "^1.6",
+		"squizlabs/php_codesniffer": "^3.6.0",
+		"phpcompatibility/php-compatibility": "^9",
+		"zenstruck/console-test": "1.x-dev"
 	},
 	"autoload": {
 		"psr-4": {
@@ -22,22 +38,29 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"Tests\\": "tests/"
+			"MadeByDenis\\WpPestIntegrationTestSetup\\Tests\\": "tests/"
 		}
 	},
-	"authors": [
-		{
-			"name": "Denis Žoljom",
-			"email": "denis.zoljom@gmail.com"
-		}
-	],
 	"minimum-stability": "dev",
+	"bin": [
+		"bin/wp-pest"
+	],
 	"scripts": {
-
+		"test:types": "@php ./vendor/bin/phpstan",
+		"test:style": "@php ./vendor/bin/phpcs",
+		"test:unit": "@php ./vendor/bin/pest",
+		"test:coverage": "@php ./vendor/bin/pest --coverage",
+		"test": [
+			"@test:style",
+			"@test:types",
+			"@test:unit"
+		]
 	},
-	"extra": {
-		"dropin-paths": {
-		    "wp/src/wp-content/": ["package:aaemnnosttv/wp-sqlite-db:src/db.php"]
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true,
+			"pestphp/pest-plugin": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
 	}
 }
