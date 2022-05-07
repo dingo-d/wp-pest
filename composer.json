@@ -1,0 +1,43 @@
+{
+	"name": "dzoljom/wp-pest-integration-test-setup",
+	"description": "A package that will add WordPress integration test suite with Pest framework",
+	"type": "library",
+	"license": "MIT",
+	"require": {
+		"php": "^7.4 || <8.0",
+		"pestphp/pest": "^1.2",
+		"aaemnnosttv/wp-sqlite-db": "^1.2",
+		"koodimonni/composer-dropin-installer": "^1.4",
+		"mnsami/composer-custom-directory-installer": "^2.0",
+		"yoast/phpunit-polyfills": "^1.0",
+		"yoast/wp-test-utils": "^1.0"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7"
+	},
+	"autoload": {
+		"psr-4": {
+			"MadeByDenis\\WpPestIntegrationTestSetup\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
+		}
+	},
+	"authors": [
+		{
+			"name": "Denis Žoljom",
+			"email": "denis.zoljom@gmail.com"
+		}
+	],
+	"minimum-stability": "dev",
+	"scripts": {
+
+	},
+	"extra": {
+		"dropin-paths": {
+		    "wp/src/wp-content/": ["package:aaemnnosttv/wp-sqlite-db:src/db.php"]
+		}
+	}
+}
