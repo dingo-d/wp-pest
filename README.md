@@ -26,7 +26,7 @@ composer require dingo-d/wp-pest-integration-test-setup --dev
 After that you can run the following command
 
 ```bash
-vendor/bin/wp-pest --project-type=theme
+vendor/bin/wp-pest theme
 ```
 
 This will set up the `tests` folder, download the latest version of [WordPress develop](https://github.com/WordPress/wordpress-develop/) repo and place it in `wp` folder. It will also set up your integration test suite with an example that you can run in your theme.
@@ -38,9 +38,27 @@ vendor/bin/wp-pest --help
 ```
 
 ```bash
---project-type=PROJECT-TYPE  Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin" [default: "theme"]
---wp-version[=WP-VERSION]    Pass the version of the WordPress you want to test on, if you don't pass the version, the latest will be used. [default: "latest"]
---skip-wp                    If you pass this argument, only the Pest unit test suite will be created.
+Description:
+  Sets up the test suites.
+
+Usage:
+  setup [options] [--] <project-type>
+
+Arguments:
+  project-type                   Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin"
+
+Options:
+      --wp-version[=WP-VERSION]  Pass the version of the WordPress you want to test on, if you don't pass the version, the latest will be used. [default: "latest"]
+      --skip-wp                  If you pass this argument, only the Pest unit test suite will be created.
+  -h, --help                     Display help for the given command. When no command is given display help for the list command
+  -q, --quiet                    Do not output any message
+  -V, --version                  Display this application version
+      --ansi|--no-ansi           Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction           Do not ask any interactive question
+  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+Help:
+  This command helps you set up WordPress integration and unit test suite.
 ```
 
 You can set up only unit test suite, but this library is more aimed at integration testing.
