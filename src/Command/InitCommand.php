@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MadeByDenis\WpPestIntegrationTestSetup\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -107,12 +108,10 @@ class InitCommand extends Command
 		$this
 			->setDescription('Sets up the test suites.')
 			->setHelp('This command helps you set up WordPress integration and unit test suite.')
-			->addOption(
+			->addArgument(
 				self::PROJECT_TYPE,
-				null,
-				InputOption::VALUE_REQUIRED,
-				'Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin"',
-				'theme'
+				InputArgument::REQUIRED,
+				'Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin"'
 			)
 			->addOption(
 				self::WP_VERSION,
@@ -145,7 +144,7 @@ class InitCommand extends Command
 
 		$wpVersion = $input->getOption(self::WP_VERSION);
 		$skipWPInstall = $input->getOption(self::SKIP);
-		$projectType = $input->getOption(self::PROJECT_TYPE);
+		$projectType = $input->getArgument(self::PROJECT_TYPE);
 
 		$filesystem = new Filesystem();
 
@@ -162,6 +161,10 @@ class InitCommand extends Command
 					$io->success('Folder created successfully');
 
 					return Command::SUCCESS;
+				} else {
+					$io->error('tests directory already exits!');
+
+					return Command::FAILURE;
 				}
 			} catch (IOExceptionInterface $exception) {
 				$io->error("Error copying directory at {$exception->getPath()}.");
