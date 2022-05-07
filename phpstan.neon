@@ -1,0 +1,10 @@
+parameters:
+	level: max
+	inferPrivatePropertyTypeFromConstructor: true
+	checkMissingIterableValueType: true
+
+	excludePaths:
+		- wp-content/
+	paths:
+		- src/
+		- tests/

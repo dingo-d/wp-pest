@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<ruleset
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="WordPress integration tests with PestPHP"
+	xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd"
+>
+	<description>The coding standards used when writing WordPress integration tests with PestPHP package</description>
+
+	<file>.</file>
+
+	<!-- Additional arguments. -->
+	<arg value="sp"/>
+
+	<arg name="basepath" value="./"/>
+	<arg name="tab-width" value="4"/>
+	<arg name="parallel" value="8"/>
+	<arg name="extensions" value="php"/>
+
+	<!-- Exclude Composer vendor directory. -->
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/wp-content/*</exclude-pattern>
+
+	<!-- Check for cross-version support for PHP 7.4 and higher. -->
+	<config name="testVersion" value="7.4-"/>
+	<rule ref="PHPCompatibility"/>
+
+	<!-- Apply PSR12 coding standards across the repo. -->
+	<rule ref="PSR12">
+		<exclude name="PSR12.Traits.UseDeclaration.MultipleImport"/>
+	</rule>
+
+	<!-- Indent using tabs. -->
+	<rule ref="Generic.WhiteSpace">
+		<exclude name="Generic.WhiteSpace.DisallowTabIndent.TabsUsed"/>
+	</rule>
+	<rule ref="Generic.WhiteSpace.DisallowSpaceIndent"/>
+	<rule ref="Generic.WhiteSpace.ScopeIndent">
+		<properties>
+			<property name="tabIndent" value="true"/>
+		</properties>
+	</rule>
+
+	<rule ref="PHPCompatibility.FunctionDeclarations.NewClosure">
+		<exclude-pattern>./tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="Squiz.WhiteSpace.ScopeClosingBrace">
+		<exclude-pattern>./tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+		<exclude-pattern>./tests/Pest.php</exclude-pattern>
+	</rule>
+</ruleset>
