@@ -16,6 +16,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Init command that will set up the WordPress integration suite
@@ -34,6 +37,15 @@ class InitCommand extends Command
 	 * @var string
 	 */
 	private const WP_VERSION = 'wp-version';
+
+	/**
+	 * Project type option string
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var string
+	 */
+	private const PROJECT_TYPE = 'project-type';
 
 	/**
 	 * Skip WordPress installation option string
@@ -96,6 +108,13 @@ class InitCommand extends Command
 			->setDescription('Sets up the test suites.')
 			->setHelp('This command helps you set up WordPress integration and unit test suite.')
 			->addOption(
+				self::PROJECT_TYPE,
+				null,
+				InputOption::VALUE_REQUIRED,
+				'Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin"',
+				'theme'
+			)
+			->addOption(
 				self::WP_VERSION,
 				null,
 				InputOption::VALUE_OPTIONAL,
@@ -122,29 +141,38 @@ class InitCommand extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
+		$io = new SymfonyStyle($input, $output);
+
 		$wpVersion = $input->getOption(self::WP_VERSION);
 		$skipWPInstall = $input->getOption(self::SKIP);
+		$projectType = $input->getOption(self::PROJECT_TYPE);
 
-		$output->writeln('<info>Creating tests folder</info>');
+		$filesystem = new Filesystem();
+
+		$io->info('Creating tests folder');
+
+		$testsDir = $this->rootPath . DIRECTORY_SEPARATOR . 'tests';
 
 		// Only setup basic test folder, don't download WP.
 		if ($skipWPInstall) {
 			// Check if folder exists, and create it if it doesn't.
-			if (!is_dir($this->rootPath . '/tests')) {
+			try {
+				if (!$filesystem->exists($testsDir)) {
+					$filesystem->mkdir($testsDir, 0755);
+					$io->success('Folder created successfully');
 
-				mkdir($this->rootPath . '/tests', 0755);
+					return Command::SUCCESS;
+				}
+			} catch (IOExceptionInterface $exception) {
+				$io->error("Error copying directory at {$exception->getPath()}.");
 
-				$output->writeln('<success>Folder created successfully</success>');
-				return Command::SUCCESS;
-			} else {
-				$output->writeln("<error>tests folder already exists!</error>");
 				return Command::FAILURE;
 			}
 		}
 
 		if ($wpVersion === 'latest') {
 			// Find the latest tag and download that one.
-			$output->writeln('<info>Downloading the latest WordPress version</info>');
+			$io->info('Downloading the latest WordPress version');
 			$wpApiInfo = json_decode(file_get_contents(self::WP_API_URL), true);
 			$latestVersion = $wpApiInfo['offers'][0]['current'];
 
@@ -152,17 +180,15 @@ class InitCommand extends Command
 
 
 
-
+			$io->success('WP downloaded successfully');
 			return Command::SUCCESS;
 		}
 
-		$output->writeln("<info>Downloading WordPress version $wpVersion</info>");
+		$io->info("Downloading WordPress version $wpVersion");
 
 
 
-
-		$output->writeln('<comment>Make sure you autoload your tests in composer.json, otherwise they probably won\'t work.</comment>');
-
+		$io->comment('Make sure you autoload your tests in composer.json, otherwise they probably won\'t work.');
 		return Command::SUCCESS;
 	}
 }
