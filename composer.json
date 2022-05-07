@@ -18,11 +18,12 @@
 		}
 	],
 	"require": {
-		"php": "^7.4 || <8.0",
+		"php": "^7.4",
 		"pestphp/pest": "^1.2",
 		"aaemnnosttv/wp-sqlite-db": "^1.2",
 		"yoast/phpunit-polyfills": "^1.0",
-		"yoast/wp-test-utils": "^1.0"
+		"yoast/wp-test-utils": "^1.0",
+		"symfony/filesystem": "5.4.x-dev"
 	},
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
