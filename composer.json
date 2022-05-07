@@ -18,7 +18,7 @@
 		}
 	],
 	"require": {
-		"php": "^7.4",
+		"php": "^7.4 || ^8.0",
 		"pestphp/pest": "^1.2",
 		"aaemnnosttv/wp-sqlite-db": "^1.2",
 		"yoast/phpunit-polyfills": "^1.0",
