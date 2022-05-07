@@ -117,7 +117,7 @@ class InitCommand extends Command
 				self::WP_VERSION,
 				null,
 				InputOption::VALUE_OPTIONAL,
-				'Pass the version of the WordPress you want to test on, if you don\'t pass the version, the latest will be used.',
+				'Pass the version of the WordPress you want to test on.',
 				'latest'
 			)
 			->addOption(
