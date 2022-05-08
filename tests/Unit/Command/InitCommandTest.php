@@ -174,7 +174,7 @@ it("checks that attempting to download wrong WordPress version will throw an exc
 	'sdlfkj97 0236 ./',
 ]);
 
-it("checks that attempting to download WordPress version with empty string, null or correct version number will work", function ($versions) {
+it("checks that attempting to download WordPress version will work", function ($versions) {
 	prepareFileStubs();
 
 	TestCommand::for($this->command)

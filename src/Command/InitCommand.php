@@ -177,6 +177,7 @@ class InitCommand extends Command
 		$pluginSlug = $input->getOption(self::PLUGIN_SLUG);
 
 		if (!in_array($projectType, ['theme', 'plugin'], true)) {
+			// @phpstan-ignore-next-line
 			$io->error("The argument must either be 'theme' or 'plugin', $projectType provided.");
 
 			return Command::FAILURE;
@@ -189,6 +190,7 @@ class InitCommand extends Command
 				return Command::FAILURE;
 			}
 
+			// @phpstan-ignore-next-line
 			if (!$this->checkIfPluginSlugIsValid($pluginSlug)) {
 				$io->error('Plugin slug must be written in lowercase, separated by a dash.');
 
@@ -208,6 +210,7 @@ class InitCommand extends Command
 			if (!$this->filesystem->exists($testsDir)) {
 				$pluginSlug = $projectType === 'plugin' ? $pluginSlug : '';
 
+				// @phpstan-ignore-next-line
 				$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug);
 
 				$io->success('Folder and files created successfully.');
@@ -239,9 +242,11 @@ class InitCommand extends Command
 
 			$io->success('WordPress downloaded successfully.');
 		} else {
+			// @phpstan-ignore-next-line
 			$io->text("Downloading WordPress version $wpVersion. This may take a while...");
 
 			try {
+				// @phpstan-ignore-next-line
 				$this->downloadWPCoreAndTests($wpVersion);
 			} catch (Exception $e) {
 				$io->error($e->getMessage());
@@ -312,11 +317,11 @@ class InitCommand extends Command
 		$this->filesystem->copy($templatesFolder . $ds . 'phpunit.xml.tmpl', $this->rootPath . $ds . 'phpunit.xml');
 		$this->filesystem->copy($templatesFolder . $ds . $bootstrap, $bootstrapOutputPath);
 		$this->filesystem->copy($templatesFolder . $ds . 'ExampleUnitTest.php.tmpl', $testsPath . $ds . 'Unit' . $ds . 'ExampleTest.php');
-		$this->filesystem->copy($templatesFolder . $ds . 'ExampleIntegrationTest.php.tmpl', $testsPath . $ds . 'Integration' . $ds . 'ExampleTest.php');
+		$this->filesystem->copy($templatesFolder . $ds . 'ExampleIntegrationTest.php.tmpl', $testsPath . $ds . 'Integration' . $ds . 'ExampleTest.php'); // phpcs:ignore Generic.Files.LineLength.TooLong
 		$this->filesystem->copy($templatesFolder . $ds . 'Pest.php.tmpl', $testsPath . $ds . 'Pest.php');
 
 		if ($projectType == 'plugin') {
-			$bootstrapContents = file_get_contents($bootstrapOutputPath);
+			$bootstrapContents = (string) file_get_contents($bootstrapOutputPath);
 			$bootstrapContents = str_replace('%%%PLUGIN-SLUG%%%', $pluginSlug, $bootstrapContents);
 			file_put_contents($bootstrapOutputPath, $bootstrapContents);
 		}
@@ -336,7 +341,7 @@ class InitCommand extends Command
 	private function downloadWPCoreAndTests(string $version)
 	{
 		if ($version === 'latest') {
-			$wpVersions = json_decode(file_get_contents(self::WP_API_TAGS), true);
+			$wpVersions = (array) json_decode((string) file_get_contents(self::WP_API_TAGS), true);
 			$version = array_key_last($wpVersions);
 		} else {
 			/**
@@ -384,7 +389,7 @@ class InitCommand extends Command
 		static $versions;
 
 		if (empty($versions)) {
-			$versions = json_decode(file_get_contents(self::WP_API_TAGS), true);
+			$versions = json_decode((string) file_get_contents(self::WP_API_TAGS), true);
 		}
 
 		if (!isset($versions[$version])) {
@@ -436,7 +441,7 @@ class InitCommand extends Command
 
 		if ($newFile) {
 			while (!feof($file)) {
-				fwrite($newFile, fread($file, $numberOfBytesToRead));
+				fwrite($newFile, (string) fread($file, $numberOfBytesToRead));
 			}
 		}
 
