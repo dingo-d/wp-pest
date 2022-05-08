@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -49,13 +49,13 @@ class InitCommand extends Command
 	private const PROJECT_TYPE = 'project-type';
 
 	/**
-	 * Skip WordPress installation option string
+	 * Plugin slug option string
 	 *
 	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
-	private const SKIP = 'skip-wp';
+	private const PLUGIN_SLUG = 'plugin-slug';
 
 	/**
 	 * WordPress API is odd.
@@ -81,6 +81,24 @@ class InitCommand extends Command
 	private const WP_GH_TAG_URL = 'https://github.com/WordPress/wordpress-develop/archive/refs/tags/';
 
 	/**
+	 * Root path of the project
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var string
+	 */
+	private string $rootPath;
+
+	/**
+	 * Filesystem dependency
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var Filesystem
+	 */
+	private Filesystem $filesystem;
+
+	/**
 	 * Command name property
 	 *
 	 * @since 1.0.0
@@ -89,9 +107,11 @@ class InitCommand extends Command
 	 */
 	protected static $defaultName = 'setup';
 
-	public function __construct(string $rootPath)
+
+	public function __construct(string $rootPath, Filesystem $filesystem)
 	{
 		$this->rootPath = $rootPath;
+		$this->filesystem = $filesystem;
 
 		parent::__construct();
 	}
@@ -121,10 +141,10 @@ class InitCommand extends Command
 				'latest'
 			)
 			->addOption(
-				self::SKIP,
+				self::PLUGIN_SLUG,
 				null,
-				InputOption::VALUE_NONE,
-				'If you pass this argument, only the Pest unit test suite will be created.'
+				InputOption::VALUE_OPTIONAL,
+				'If you are setting the plugin tests provide the plugin slug.'
 			);
 	}
 
@@ -142,42 +162,62 @@ class InitCommand extends Command
 	{
 		$io = new SymfonyStyle($input, $output);
 
-		$wpVersion = $input->getOption(self::WP_VERSION);
-		$skipWPInstall = $input->getOption(self::SKIP);
 		$projectType = $input->getArgument(self::PROJECT_TYPE);
+		$pluginSlug = $input->getOption(self::PLUGIN_SLUG);
 
-		$filesystem = new Filesystem();
+		if (!in_array($projectType, ['theme', 'plugin'], true)) {
+			$io->error("The argument must either be 'theme' or 'plugin', $projectType provided.");
 
-		$io->info('Creating tests folder');
+			return Command::FAILURE;
+		}
 
-		$testsDir = $this->rootPath . DIRECTORY_SEPARATOR . 'tests';
-
-		// Only setup basic test folder, don't download WP.
-		if ($skipWPInstall) {
-			// Check if folder exists, and create it if it doesn't.
-			try {
-				if (!$filesystem->exists($testsDir)) {
-					$filesystem->mkdir($testsDir, 0755);
-					$io->success('Folder created successfully');
-
-					return Command::SUCCESS;
-				} else {
-					$io->error('tests directory already exits!');
-
-					return Command::FAILURE;
-				}
-			} catch (IOExceptionInterface $exception) {
-				$io->error("Error copying directory at {$exception->getPath()}.");
+		if ($projectType === 'plugin') {
+			if (empty($pluginSlug)) {
+				$io->error('You need to provide the plugin slug if you want to set up plugin integration test suite.');
 
 				return Command::FAILURE;
 			}
 		}
 
+		$wpVersion = $input->getOption(self::WP_VERSION);
+
+		$io->info('Attempting to create tests folder');
+
+		$testsDir = $this->rootPath . DIRECTORY_SEPARATOR . 'tests';
+		$wpDir = $this->rootPath . DIRECTORY_SEPARATOR . 'wp';
+
+		// Check if folder exists, and create it if it doesn't.
+		try {
+			if (!$this->filesystem->exists($testsDir)) {
+				$this->setUpBasicTestFiles($testsDir, $projectType);
+
+				$io->success('Folder and files created successfully.');
+
+				return Command::SUCCESS;
+			} else {
+				$io->info('tests/ directory already exits. Moving on.');
+			}
+		} catch (IOException $exception) {
+			$io->error("Error happened when creating files and folders at {$exception->getPath()}. \
+			Error message: {$exception->getMessage()}");
+
+			return Command::FAILURE;
+		}
+
+		if ($this->filesystem->exists($wpDir)) {
+			$io->info('WordPress core and test files already downloaded. No need to run this command again.');
+
+			return Command::FAILURE;
+		}
+
 		if ($wpVersion === 'latest') {
 			// Find the latest tag and download that one.
 			$io->info('Downloading the latest WordPress version');
-			$wpApiInfo = json_decode(file_get_contents(self::WP_API_URL), true);
-			$latestVersion = $wpApiInfo['offers'][0]['current'];
+
+			$this->downloadWPCoreAndTests($this->rootPath, 'latest');
+
+
+
 
 
 
@@ -188,10 +228,61 @@ class InitCommand extends Command
 		}
 
 		$io->info("Downloading WordPress version $wpVersion");
+		$this->downloadWPCoreAndTests($this->rootPath, $wpVersion);
 
 
 
 		$io->comment('Make sure you autoload your tests in composer.json, otherwise they probably won\'t work.');
 		return Command::SUCCESS;
+	}
+
+	/**
+	 * Sets up the test files
+	 *
+	 * This method will:
+	 *  - Create a test folder in your project root
+	 *  - Copy phpunit.xml.tmpl with the database details
+	 *  - Set up Integration/Unit test examples
+	 *
+	 * @param string $testsPath Root path of the project.
+	 * @param string $projectType Type of project to set up. Default is theme.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 * @throws IOException Throws exception in case something fails with fs operations.
+	 */
+	private function setUpBasicTestFiles(string $testsPath, string $projectType = 'theme'): void
+	{
+		$ds = DIRECTORY_SEPARATOR;
+
+		$this->filesystem->mkdir($testsPath, 0755);
+
+		// Copy phpunit.xml.tmpl from templates folder.
+		$templatesFolder = dirname(__FILE__, 3) . $ds . 'templates';
+
+		$bootstrap = ($projectType === 'theme') ? 'bootstrap-theme.php.tmpl' : 'bootstrap-plugin.php.tmpl';
+
+		$this->filesystem->copy($templatesFolder . $ds . 'phpunit.xml.tmpl', $this->rootPath . $ds . 'phpunit.xml');
+		$this->filesystem->copy($templatesFolder . $ds . $bootstrap, $testsPath . $ds . 'bootstrap.php');
+		$this->filesystem->copy($templatesFolder . $ds . 'ExampleUnitTest.php.tmpl', $testsPath . $ds . 'Unit' . $ds . 'ExampleTest.php');
+		$this->filesystem->copy($templatesFolder . $ds . 'ExampleIntegrationTest.php.tmpl', $testsPath . $ds . 'Integration' . $ds . 'ExampleTest.php');
+		$this->filesystem->copy($templatesFolder . $ds . 'Pest.php.tmpl', $testsPath . $ds . 'Pest.php');
+	}
+
+	/**
+	 * Downloads the WordPress core and test files and copies them to correct folder
+	 *
+	 * @param string $rootPath Root path of the project.
+	 * @param string $version Version to download.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	private function downloadWPCoreAndTests(string $rootPath, string $version)
+	{
+		$wpApiInfo = json_decode(file_get_contents(self::WP_API_URL), true);
+		$latestVersion = $wpApiInfo['offers'][0]['current'];
 	}
 }
