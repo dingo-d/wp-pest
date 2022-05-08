@@ -170,6 +170,7 @@ class InitCommand extends Command
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$io = new SymfonyStyle($input, $output);
+		$ds = DIRECTORY_SEPARATOR;
 
 		$projectType = $input->getArgument(self::PROJECT_TYPE);
 		$pluginSlug = $input->getOption(self::PLUGIN_SLUG);
@@ -198,8 +199,8 @@ class InitCommand extends Command
 
 		$io->info('Attempting to create tests folder');
 
-		$testsDir = $this->rootPath . DIRECTORY_SEPARATOR . 'tests';
-		$wpDir = $this->rootPath . DIRECTORY_SEPARATOR . 'wp';
+		$testsDir = $this->rootPath . $ds . 'tests';
+		$wpDir = $this->rootPath . $ds . 'wp';
 
 		// Check if folder exists, and create it if it doesn't.
 		try {
@@ -250,10 +251,19 @@ class InitCommand extends Command
 
 		$io->success('WordPress downloaded successfully');
 
-		// Copy the DB files in a correct place.
+		/**
+		 * Copy the DB files in a correct place.
+		 *
+		 * Because the DB package is a WP dropin, that means that the folder `wp-content/wp-sqlite-db`
+		 * will be copied in the project root (kinda annoying). So we need to manually clean that folder.
+		 */
+		$packageDropin = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+		$coreDropin = $this->rootPath . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content' . $ds . 'db.php';
 
+		$this->filesystem->copy($packageDropin, $coreDropin);
+		$this->filesystem->remove($this->rootPath . $ds . 'wp-content');
 
-		$io->comment('Make sure you autoload your tests in composer.json, otherwise they probably won\'t work.');
+		$io->comment("Make sure you autoload your tests in composer.json, otherwise they probably won't work.");
 		return Command::SUCCESS;
 	}
 
@@ -332,7 +342,7 @@ class InitCommand extends Command
 		$tmpFile = file_put_contents($zipName, file_get_contents(self::WP_GH_TAG_URL . $version . '.zip'), LOCK_EX);
 
 		if ($tmpFile === false) {
-			throw new RuntimeException('Couldn\'t download the WordPress archive.');
+			throw new RuntimeException("Couldn't download the WordPress archive.");
 		}
 
 		$zip = new ZipArchive();
