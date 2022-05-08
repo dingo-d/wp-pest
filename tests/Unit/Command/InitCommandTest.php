@@ -26,20 +26,20 @@ afterEach(function () {
 	deleteOutputDir();
 });
 
-it('checks that the command name is correct', function () {
+it("checks that the command name is correct", function () {
 	expect($this->command::getDefaultName())->toBe('setup');
 });
 
-it('checks that the command doesn\'t have default description', function () {
+it("checks that the command doesn't have default description", function () {
 	expect($this->command::getDefaultDescription())->toBeNull();
 });
 
-it('checks that the command throws error when argument isn\'t specified', function () {
+it("checks that the command throws error when argument isn't specified", function () {
 	TestCommand::for($this->command)
 		->execute();
 })->expectException('RuntimeException');
 
-it('checks that the command throws error when argument isn\'t correct', function () {
+it("checks that the command throws error when argument isn't correct", function () {
 	TestCommand::for($this->command)
 		->addArgument('bla')
 		->execute()
@@ -47,7 +47,7 @@ it('checks that the command throws error when argument isn\'t correct', function
 		->assertOutputContains("The argument must either be 'theme' or 'plugin', bla provided");
 });
 
-it('checks that the command throws error when plugin slug isn\'t provided for plugin set up', function () {
+it("checks that the command throws error when plugin slug isn't provided for plugin set up", function () {
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->execute()
@@ -55,7 +55,7 @@ it('checks that the command throws error when plugin slug isn\'t provided for pl
 		->assertOutputContains("You need to provide the plugin slug if you want to set up plugin integration test suite.");
 });
 
-it('checks that the command throws error if the wp directory already exists', function () {
+it("checks that the command throws error if the wp directory already exists", function () {
 	$this->fileSystem->mkdir($this->outputDir . DIRECTORY_SEPARATOR . 'wp');
 
 	TestCommand::for($this->command)
@@ -65,7 +65,7 @@ it('checks that the command throws error if the wp directory already exists', fu
 		->assertOutputContains("WordPress core and test files already downloaded. No need to run this command again.");
 });
 
-it('checks that the command throws error if the plugin slug isn\'t valid', function ($slugs) {
+it("checks that the command throws error if the plugin slug isn't valid", function ($slugs) {
 	prepareFileStubs();
 
 	TestCommand::for($this->command)
@@ -87,8 +87,7 @@ it('checks that the command throws error if the plugin slug isn\'t valid', funct
 	"this-is-ok.zip",
 ]);
 
-
-it('checks that the command works ok if the plugin slug is valid', function ($slugs) {
+it("checks that the command works ok if the plugin slug is valid", function ($slugs) {
 	prepareFileStubs();
 
 	TestCommand::for($this->command)
@@ -102,7 +101,7 @@ it('checks that the command works ok if the plugin slug is valid', function ($sl
 	'thisisok',
 ]);
 
-it('checks that the command creates folder with correct templates for a plugin', function () {
+it("checks that the command creates folder with correct templates for a plugin", function () {
 	prepareFileStubs();
 
 	TestCommand::for($this->command)
@@ -137,7 +136,7 @@ it('checks that the command creates folder with correct templates for a plugin',
 	expect($zipContents)->toContain('Hi!');
 });
 
-it('checks that the command creates folder with correct templates for a theme', function () {
+it("checks that the command creates folder with correct templates for a theme", function () {
 	prepareFileStubs();
 
 	TestCommand::for($this->command)
@@ -159,7 +158,7 @@ it('checks that the command creates folder with correct templates for a theme', 
 	expect($bootstrapContents)->toContain('\tests_add_filter(\'muplugins_loaded\', \'_register_theme\');');
 });
 
-it('checks that attempting to download wrong WordPress version will throw an exception', function ($versions) {
+it("checks that attempting to download wrong WordPress version will throw an exception", function ($versions) {
 	prepareFileStubs();
 
 	TestCommand::for($this->command)
@@ -175,7 +174,7 @@ it('checks that attempting to download wrong WordPress version will throw an exc
 	'sdlfkj97 0236 ./',
 ]);
 
-it('checks that attempting to download WordPress version with empty string, null or correct version number will work', function ($versions) {
+it("checks that attempting to download WordPress version with empty string, null or correct version number will work", function ($versions) {
 	prepareFileStubs();
 
 	TestCommand::for($this->command)
