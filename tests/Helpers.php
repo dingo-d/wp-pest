@@ -10,7 +10,9 @@
 
 namespace MadeByDenis\WpPestIntegrationTestSetup\Tests;
 
+use Brain\Monkey\Functions;
 use FilesystemIterator;
+use MadeByDenis\WpPestIntegrationTestSetup\Command\InitCommand;
 use Mockery;
 use Mockery\MockInterface;
 use RecursiveDirectoryIterator;
@@ -31,7 +33,7 @@ function mock(string $class): MockInterface
 }
 
 /**
- * Used for cleaning out the cliOutput created after every CLI test
+ * Used for cleaning out the output directory created after every test
  *
  * @param string $dir Directory to remove.
  *
@@ -61,4 +63,31 @@ function deleteOutputDir(string $dir = '') : void
 	}
 
 	rmdir($dir);
+}
+
+/**
+ * Used for setting up file_get_contents stubs
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function prepareFileStubs(): void {
+	$ds = DIRECTORY_SEPARATOR;
+	$versions = file_get_contents(dirname(__FILE__) . $ds . 'stubs' . $ds . 'stable-check.json');
+	$zip = file_get_contents(dirname(__FILE__) . $ds . 'stubs' . $ds . 'hello.zip');
+
+	// Mock file get contents. So that we don't really call the API.
+	Functions\stubs([
+		'file_get_contents' => function (string $filename) use ($versions, $zip) {
+			switch (true) {
+				case strpos($filename, InitCommand::WP_GH_TAG_URL) !== false:
+					return $zip;
+				case strpos($filename, InitCommand::WP_API_TAGS) !== false:
+					return $versions;
+				default:
+					return file_get_contents($filename);
+			}
+		},
+	]);
 }
