@@ -41,7 +41,6 @@ it('checks that the command throws error when argument isn\'t specified', functi
 });
 
 it('checks that the command throws error when argument isn\'t correct', function () {
-
 	TestCommand::for($this->command)
 		->addArgument('bla')
 		->execute()
@@ -50,7 +49,6 @@ it('checks that the command throws error when argument isn\'t correct', function
 });
 
 it('checks that the command throws error when plugin slug isn\'t provided for plugin set up', function () {
-
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->execute()
@@ -59,7 +57,6 @@ it('checks that the command throws error when plugin slug isn\'t provided for pl
 });
 
 it('checks that the command creates folder with correct templates for a plugin', function () {
-
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->addOption('plugin-slug', 'fake-plugin')
@@ -69,20 +66,23 @@ it('checks that the command creates folder with correct templates for a plugin',
 	// Check if the files were created, as intended.
 	expect($this->outputDir)->toBeDirectory();
 
-	$bootstrapFilePath = $this->outputDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'bootstrap.php';
+	$testsFolder = $this->outputDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
+	$bootstrapFilePath = $testsFolder . 'bootstrap.php';
 
+	// Check if correct files are copied over.
 	expect($this->outputDir . DIRECTORY_SEPARATOR . 'phpunit.xml')->toBeReadableFile();
+	expect($testsFolder . 'Pest.php')->toBeReadableFile();
+	expect($testsFolder . 'Unit' . DIRECTORY_SEPARATOR . 'ExampleTest.php')->toBeReadableFile();\
+	expect($testsFolder . 'Integration' . DIRECTORY_SEPARATOR . 'ExampleTest.php')->toBeReadableFile();
 	expect($bootstrapFilePath)->toBeReadableFile();
 
-	// Ensure the contents are correct.
+	// Ensure the contents of the bootstrap.php file are correct.
 	$bootstrapContents = file_get_contents($bootstrapFilePath);
 
 	expect($bootstrapContents)->toContain('%%%PLUGIN-SLUG%%%.php');
 });
 
-
 it('checks that the command creates folder with correct templates for a theme', function () {
-
 	TestCommand::for($this->command)
 		->addArgument('theme')
 		->execute()
@@ -93,7 +93,7 @@ it('checks that the command creates folder with correct templates for a theme', 
 
 	$bootstrapFilePath = $this->outputDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-	expect($this->outputDir . DIRECTORY_SEPARATOR . 'phpunit.xml')->toBeReadableFile();
+	// Check if correct file is copied over.
 	expect($bootstrapFilePath)->toBeReadableFile();
 
 	// Ensure the contents are correct.
