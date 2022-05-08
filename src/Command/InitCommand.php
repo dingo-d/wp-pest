@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MadeByDenis\WpPestIntegrationTestSetup\Command;
 
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +23,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use ZipArchive;
+
+use function PHPUnit\Framework\matches;
 
 /**
  * Init command that will set up the WordPress integration suite
@@ -60,18 +63,6 @@ class InitCommand extends Command
 	private const PLUGIN_SLUG = 'plugin-slug';
 
 	/**
-	 * WordPress API is odd.
-	 *
-	 * HTTP URL will serve a single instance of the latest offer, whereas HTTPS will serve multiple.
-	 * We only need the one to see what is the latest version of WP.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var string
-	 */
-	private const WP_API_URL = 'http://api.wordpress.org/core/version-check/1.7/';
-
-	/**
 	 * WordPress GitHub tag zip url
 	 *
 	 * At the end there needs to go the version followed by .zip in order to fetch the contents.
@@ -80,7 +71,7 @@ class InitCommand extends Command
 	 *
 	 * @var string
 	 */
-	private const WP_GH_TAG_URL = 'https://github.com/WordPress/wordpress-develop/archive/refs/tags/';
+	public const WP_GH_TAG_URL = 'https://github.com/WordPress/wordpress-develop/archive/refs/tags/';
 
 	/**
 	 * WordPress version tags
@@ -89,7 +80,7 @@ class InitCommand extends Command
 	 *
 	 * @var string
 	 */
-	private const WP_API_TAGS = 'https://api.wordpress.org/core/stable-check/1.0/';
+	public const WP_API_TAGS = 'https://api.wordpress.org/core/stable-check/1.0/';
 
 	/**
 	 * Root path of the project
@@ -118,7 +109,14 @@ class InitCommand extends Command
 	 */
 	protected static $defaultName = 'setup';
 
-
+	/**
+	 * Command class constructor
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $rootPath Root path of the project.
+	 * @param Filesystem $filesystem Symfony filesystem dependency.
+	 */
 	public function __construct(string $rootPath, Filesystem $filesystem)
 	{
 		$this->rootPath = $rootPath;
@@ -188,6 +186,12 @@ class InitCommand extends Command
 
 				return Command::FAILURE;
 			}
+
+			if (!$this->checkIfPluginSlugIsValid($pluginSlug)) {
+				$io->error('Plugin slug must be written in lowercase, separated by a dash.');
+
+				return Command::FAILURE;
+			}
 		}
 
 		$wpVersion = $input->getOption(self::WP_VERSION);
@@ -200,17 +204,17 @@ class InitCommand extends Command
 		// Check if folder exists, and create it if it doesn't.
 		try {
 			if (!$this->filesystem->exists($testsDir)) {
-				$this->setUpBasicTestFiles($testsDir, $projectType);
+				$pluginSlug = $projectType === 'plugin' ? $pluginSlug : '';
+
+				$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug);
 
 				$io->success('Folder and files created successfully.');
-
-				return Command::SUCCESS;
 			} else {
 				$io->info('tests/ directory already exits. Moving on.');
 			}
 		} catch (IOException $exception) {
-			$io->error("Error happened when creating files and folders at {$exception->getPath()}. \
-			Error message: {$exception->getMessage()}");
+			$io->error("Error happened when creating files and folders at {$exception->getPath()}. " .
+				"Error message: {$exception->getMessage()}");
 
 			return Command::FAILURE;
 		}
@@ -221,17 +225,15 @@ class InitCommand extends Command
 			return Command::FAILURE;
 		}
 
+		// Guard against empty string or nulls
+		$wpVersion = !empty($wpVersion) ? $wpVersion : 'latest';
+
 		if ($wpVersion === 'latest') {
 			// Find the latest tag and download that one.
 			$io->info('Downloading the latest WordPress version');
 
-			try {
-				$this->downloadWPCoreAndTests('latest');
-			} catch (InvalidArgumentException $e) {
-				$io->error($e->getMessage());
-
-				return Command::FAILURE;
-			}
+			// Latest tag cannot throw exception, so no need to wrap it in try/catch.
+			$this->downloadWPCoreAndTests('latest');
 
 			$io->success('WordPress downloaded successfully');
 			return Command::SUCCESS;
@@ -265,13 +267,14 @@ class InitCommand extends Command
 	 *
 	 * @param string $testsPath Root path of the project.
 	 * @param string $projectType Type of project to set up. Default is theme.
+	 * @param string $pluginSlug Plugin slug.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
 	 * @throws IOException Throws exception in case something fails with fs operations.
 	 */
-	private function setUpBasicTestFiles(string $testsPath, string $projectType = 'theme'): void
+	private function setUpBasicTestFiles(string $testsPath, string $projectType = 'theme', string $pluginSlug = ''): void
 	{
 		$ds = DIRECTORY_SEPARATOR;
 
@@ -281,16 +284,23 @@ class InitCommand extends Command
 		$templatesFolder = dirname(__FILE__, 3) . $ds . 'templates';
 
 		$bootstrap = ($projectType === 'theme') ? 'bootstrap-theme.php.tmpl' : 'bootstrap-plugin.php.tmpl';
+		$bootstrapOutputPath = $testsPath . $ds . 'bootstrap.php';
 
 		$this->filesystem->copy($templatesFolder . $ds . 'phpunit.xml.tmpl', $this->rootPath . $ds . 'phpunit.xml');
-		$this->filesystem->copy($templatesFolder . $ds . $bootstrap, $testsPath . $ds . 'bootstrap.php');
+		$this->filesystem->copy($templatesFolder . $ds . $bootstrap, $bootstrapOutputPath);
 		$this->filesystem->copy($templatesFolder . $ds . 'ExampleUnitTest.php.tmpl', $testsPath . $ds . 'Unit' . $ds . 'ExampleTest.php');
 		$this->filesystem->copy($templatesFolder . $ds . 'ExampleIntegrationTest.php.tmpl', $testsPath . $ds . 'Integration' . $ds . 'ExampleTest.php');
 		$this->filesystem->copy($templatesFolder . $ds . 'Pest.php.tmpl', $testsPath . $ds . 'Pest.php');
+
+		if ($projectType == 'plugin') {
+			$bootstrapContents = file_get_contents($bootstrapOutputPath);
+			$bootstrapContents = str_replace('%%%PLUGIN-SLUG%%%', $pluginSlug, $bootstrapContents);
+			file_put_contents($bootstrapOutputPath, $bootstrapContents);
+		}
 	}
 
 	/**
-	 * Downloads the WordPress core and test files and copies them to correct folder
+	 * Downloads the WordPress core and core test files and copies them to correct folder
 	 *
 	 * @param string $version Version to download.
 	 *
@@ -298,27 +308,41 @@ class InitCommand extends Command
 	 *
 	 * @return void
 	 * @throws InvalidArgumentException Throws an exception if the version number is not correct.
+	 * @throws RuntimeException Throws an exception if the file download fails.
 	 */
 	private function downloadWPCoreAndTests(string $version)
 	{
-		if (empty($version)) {
-			$wpApiInfo = json_decode(file_get_contents(self::WP_API_URL), true);
-			$version = $wpApiInfo['offers'][0]['current'];
-		}
-
-		if (!$this->isWPVersionValid($version)) {
-			throw new InvalidArgumentException('Wrong WordPress version. Make sure the version number is correct.');
+		if ($version === 'latest') {
+			$wpVersions = json_decode(file_get_contents(self::WP_API_TAGS), true);
+			$version = array_key_last($wpVersions);
+		} else {
+			/**
+			 * Only validate if the parameter was passed.
+			 *
+			 * If the latest tag is used, the API will already be called, and we know that they
+			 * have the correct versions (because it's the same API used to check the validity of versions).
+			 */
+			if (!$this->isWPVersionValid($version)) {
+				throw new InvalidArgumentException('Wrong WordPress version. Make sure the version number is correct.');
+			}
 		}
 
 		// Download a zip file, unzip it to root/wp folder and delete the .zip file.
-		$value = file_get_contents(self::WP_GH_TAG_URL . $version . 'zip');
+		$zipName = $this->rootPath . DIRECTORY_SEPARATOR . "wordpress-develop-$version.zip";
+		$tmpFile = file_put_contents($zipName, file_get_contents(self::WP_GH_TAG_URL . $version . '.zip'), LOCK_EX);
+
+		if ($tmpFile === false) {
+			throw new RuntimeException('Couldn\'t download the WordPress archive.');
+		}
 
 		$zip = new ZipArchive();
 
-		if ($zip->open(str_replace('//', '/', $value)) === true) {
+		if ($zip->open($zipName)) {
 			$zip->extractTo($this->rootPath . DIRECTORY_SEPARATOR . 'wp');
 			$zip->close();
 		}
+
+		unlink($zipName);
 	}
 
 	/**
@@ -326,16 +350,41 @@ class InitCommand extends Command
 	 *
 	 * @param string $version Version number.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @return bool True if the response returns correct value. False otherwise.
 	 */
 	private function isWPVersionValid(string $version): bool
 	{
-		$versions = json_decode(file_get_contents(self::WP_API_TAGS), true);
+		// Memoization.
+		static $versions;
+
+		if (empty($versions)) {
+			$versions = json_decode(file_get_contents(self::WP_API_TAGS), true);
+		}
 
 		if (!isset($versions[$version])) {
 			return false;
 		};
 
 		return true;
+	}
+
+	/**
+	 * Check for the validity of the plugin slug
+	 *
+	 * @link https://developer.wordpress.org/plugins/wordpress-org/plugin-developer-faq/#what-will-my-plugin-permalink-slug-be
+	 *
+	 * @param string $pluginSlug Plugin slug option passed to the command.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool True if the plugin slug is valid, false if not.
+	 */
+	private function checkIfPluginSlugIsValid(string $pluginSlug): bool
+	{
+		preg_match_all('/^[a-z\-]+$/m', $pluginSlug, $matches, PREG_SET_ORDER);
+
+		return !empty($matches);
 	}
 }
