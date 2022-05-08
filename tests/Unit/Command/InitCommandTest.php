@@ -187,3 +187,17 @@ it("checks that attempting to download WordPress version with empty string, null
 	'',
 	'5.4'
 ]);
+
+it('checks that the database dropin is copied over correctly', function () {
+	$ds = DIRECTORY_SEPARATOR;
+	prepareFileStubs();
+
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->execute()
+		->assertSuccessful();
+
+	// Check if the files were created, as intended.
+	expect($this->outputDir . $ds . 'wp')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content' . $ds . 'db.php')->toBeReadableFile();
+});
