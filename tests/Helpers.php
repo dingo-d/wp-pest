@@ -75,7 +75,8 @@ function deleteOutputDir(string $dir = '') : void
 function prepareFileStubs(): void {
 	$ds = DIRECTORY_SEPARATOR;
 	$versions = file_get_contents(dirname(__FILE__) . $ds . 'stubs' . $ds . 'stable-check.json');
-	$zip = file_get_contents(dirname(__FILE__) . $ds . 'stubs' . $ds . 'hello.zip');
+	$zipPath = dirname(__FILE__) . $ds . 'stubs' . $ds . 'hello.zip';
+	$zip = file_get_contents($zipPath);
 
 	// Mock file get contents. So that we don't really call the API.
 	Functions\stubs([
@@ -87,6 +88,14 @@ function prepareFileStubs(): void {
 					return $versions;
 				default:
 					return file_get_contents($filename);
+			}
+		},
+		'fopen' => function($url, $mode) use ($zipPath) {
+			switch (true) {
+				case strpos($url, InitCommand::WP_GH_TAG_URL) !== false:
+					return fopen($zipPath, $mode);
+				default:
+					return fopen($url, $mode);
 			}
 		},
 	]);
