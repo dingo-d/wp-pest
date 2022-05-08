@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MadeByDenis\WpPestIntegrationTestSetup\Command;
 
+use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -243,7 +244,7 @@ class InitCommand extends Command
 		$io->text("Downloading WordPress version $wpVersion. This may take a while...");
 		try {
 			$this->downloadWPCoreAndTests($wpVersion);
-		} catch (InvalidArgumentException $e) {
+		} catch (Exception $e) {
 			$io->error($e->getMessage());
 
 			return Command::FAILURE;
@@ -339,14 +340,12 @@ class InitCommand extends Command
 
 		// Download a zip file, unzip it to root/wp folder and delete the .zip file.
 		$zipName = $this->rootPath . DIRECTORY_SEPARATOR . "wordpress-develop-$version.zip";
-//		$zipFileRemote = file_get_contents(self::WP_GH_TAG_URL . $version . '.zip');
-//		$tmpFile = file_put_contents($zipName, $zipFileRemote, LOCK_EX);
 
-		$this->downloadFile(self::WP_GH_TAG_URL . $version . '.zip', $zipName);
-
-//		if ($tmpFile === false) {
-//			throw new RuntimeException("Couldn't download the WordPress archive.");
-//		}
+		try {
+			$this->downloadFile(self::WP_GH_TAG_URL . $version . '.zip', $zipName);
+		} catch (\RuntimeException $e) {
+			throw new RuntimeException('Failed opening remote file');
+		}
 
 		$zip = new ZipArchive();
 
@@ -401,23 +400,38 @@ class InitCommand extends Command
 		return !empty($matches);
 	}
 
-	private function downloadFile($url, $path)
+	/**
+	 * Download a file from a remote source
+	 *
+	 * @link https://stackoverflow.com/a/3938844/629127
+	 *
+	 * @param string $url Url to download from.
+	 * @param string $path Path of the file to download to.
+	 *
+	 * @return void
+	 * @throws RuntimeException Throws an exception if the file download fails.
+	 */
+	private function downloadFile(string $url, string $path): void
 	{
-		$newfname = $path;
 		$file = fopen($url, 'rb');
-		if ($file) {
-			$newf = fopen($newfname, 'wb');
-			if ($newf) {
-				while (!feof($file)) {
-					fwrite($newf, fread($file, 1024 * 8), 1024 * 8);
-				}
+		$numberOfBytesToRead = 1024 * 1024 * 4;
+
+		if (!$file) {
+			throw new RuntimeException('Failed opening remote file');
+		}
+
+		$newFile = fopen($path, 'wb');
+
+		if ($newFile) {
+			while (!feof($file)) {
+				fwrite($newFile, fread($file, $numberOfBytesToRead));
 			}
 		}
-		if ($file) {
-			fclose($file);
-		}
-		if ($newf) {
-			fclose($newf);
+
+		fclose($file);
+
+		if ($newFile) {
+			fclose($newFile);
 		}
 	}
 }
