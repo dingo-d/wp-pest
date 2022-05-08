@@ -231,7 +231,7 @@ class InitCommand extends Command
 
 		if ($wpVersion === 'latest') {
 			// Find the latest tag and download that one.
-			$io->info('Downloading the latest WordPress version');
+			$io->text('Downloading the latest WordPress version. This may take a while...');
 
 			// Latest tag cannot throw exception, so no need to wrap it in try/catch.
 			$this->downloadWPCoreAndTests('latest');
@@ -240,7 +240,7 @@ class InitCommand extends Command
 			return Command::SUCCESS;
 		}
 
-		$io->info("Downloading WordPress version $wpVersion");
+		$io->text("Downloading WordPress version $wpVersion. This may take a while...");
 		try {
 			$this->downloadWPCoreAndTests($wpVersion);
 		} catch (InvalidArgumentException $e) {
@@ -339,11 +339,14 @@ class InitCommand extends Command
 
 		// Download a zip file, unzip it to root/wp folder and delete the .zip file.
 		$zipName = $this->rootPath . DIRECTORY_SEPARATOR . "wordpress-develop-$version.zip";
-		$tmpFile = file_put_contents($zipName, file_get_contents(self::WP_GH_TAG_URL . $version . '.zip'), LOCK_EX);
+//		$zipFileRemote = file_get_contents(self::WP_GH_TAG_URL . $version . '.zip');
+//		$tmpFile = file_put_contents($zipName, $zipFileRemote, LOCK_EX);
 
-		if ($tmpFile === false) {
-			throw new RuntimeException("Couldn't download the WordPress archive.");
-		}
+		$this->downloadFile(self::WP_GH_TAG_URL . $version . '.zip', $zipName);
+
+//		if ($tmpFile === false) {
+//			throw new RuntimeException("Couldn't download the WordPress archive.");
+//		}
 
 		$zip = new ZipArchive();
 
@@ -396,5 +399,25 @@ class InitCommand extends Command
 		preg_match_all('/^[a-z\-]+$/m', $pluginSlug, $matches, PREG_SET_ORDER);
 
 		return !empty($matches);
+	}
+
+	private function downloadFile($url, $path)
+	{
+		$newfname = $path;
+		$file = fopen($url, 'rb');
+		if ($file) {
+			$newf = fopen($newfname, 'wb');
+			if ($newf) {
+				while (!feof($file)) {
+					fwrite($newf, fread($file, 1024 * 8), 1024 * 8);
+				}
+			}
+		}
+		if ($file) {
+			fclose($file);
+		}
+		if ($newf) {
+			fclose($newf);
+		}
 	}
 }
