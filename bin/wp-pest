@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 use MadeByDenis\WpPestIntegrationTestSetup\Command\InitCommand;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Filesystem\Filesystem;
 
 if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     echo 'Warning: The console should be invoked via the CLI version of PHP, not the ' . PHP_SAPI . ' SAPI' . PHP_EOL;
@@ -29,6 +30,6 @@ $rootPath = dirname($autoloadPath, 2);
 
 $app = new Application();
 
-$app->add(new InitCommand($rootPath));
+$app->add(new InitCommand($rootPath, new Filesystem()));
 
 $app->run();
