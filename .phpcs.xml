@@ -39,6 +39,14 @@
 		</properties>
 	</rule>
 
+	<!-- Allow a bit more than 120 characters in a line. -->
+	<rule ref="Generic.Files.LineLength">
+		<properties>
+			<property name="lineLimit" value="140" />
+			<property name="ignoreComments" value="true" />
+		</properties>
+	</rule>
+
 	<rule ref="PHPCompatibility.FunctionDeclarations.NewClosure">
 		<exclude-pattern>./tests/*</exclude-pattern>
 	</rule>
@@ -50,4 +58,5 @@
 	<rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
 		<exclude-pattern>./tests/Pest.php</exclude-pattern>
 	</rule>
+
 </ruleset>
