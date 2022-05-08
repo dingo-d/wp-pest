@@ -79,10 +79,3 @@ Underlying aim of this package (besides getting WordPress developers more acquai
 While WordPress supports PHP 5.6, it's no longer even supported with security patches (at the time of writing this PHP 7.3 is in the [EOL phase](https://www.php.net/supported-versions.php)).
 
 The WordPress community needs to move on, and if this package will help somebody to update their servers and PHP version I'll call that a success.
-
-## To Do: 
-
-- add command to initialize test setup - we can provide WP version there, etc.
-- add commands (symfony) that will copy over necessary template files and setup everything
-- test everything!
-- Expand the test suite to include PHP 8.2 as nightly (allowed failure)
