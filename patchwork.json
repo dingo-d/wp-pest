@@ -2,6 +2,7 @@
   "redefinable-internals": [
     "mkdir",
     "file_get_contents",
-    "file_put_contents"
+    "file_put_contents",
+    "fopen",
   ]
 }
