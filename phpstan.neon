@@ -1,10 +1,15 @@
-parameters:
-	level: max
-	inferPrivatePropertyTypeFromConstructor: true
-	checkMissingIterableValueType: true
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
 
-	excludePaths:
-		- wp-content/
-	paths:
-		- src/
-		- tests/
+parameters:
+  level: max
+  inferPrivatePropertyTypeFromConstructor: true
+  checkMissingIterableValueType: true
+
+  symfony:
+    consoleApplicationLoader: tests/console-application.php
+
+  excludePaths:
+    - wp-content/
+  paths:
+    - src/
