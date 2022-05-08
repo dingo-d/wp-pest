@@ -63,6 +63,12 @@ Help:
 
 You can set up only unit test suite, but this library is more aimed at integration testing.
 
+## Under the hood
+
+For an in-depth reasoning and explanation of how this package came to be, you can read [this article](https://madebydenis.com/wordpress-integration-tests-with-pest-php/).
+
+Basically what's "under the hood" is downloaded [wordpress-develop](https://github.com/WordPress/wordpress-develop) to your project, added an in memory DB (sql lite from [aaemnnosttv/wp-sqlite-db](https://github.com/aaemnnosttv/wp-sqlite-db)), and a base test class from [Yoast/wp-test-utils](https://github.com/Yoast/wp-test-utils). All that combined allows you to run integration tests in WordPress with Pest PHP.
+
 ## Test example
 
 ## Questions
