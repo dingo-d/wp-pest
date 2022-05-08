@@ -63,10 +63,5 @@
       "pestphp/pest-plugin": true,
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
-  },
-  "extra": {
-    "installer-disable": [
-      "wordpress"
-    ]
   }
 }
