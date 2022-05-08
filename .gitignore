@@ -1,5 +1,6 @@
 /vendor/
 /tests/coverage
+/tests/output/
 /wp-content
 composer.lock
 .phpunit.result.cache
