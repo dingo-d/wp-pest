@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MadeByDenis\WpPestIntegrationTestSetup\Command;
 
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use ZipArchive;
 
 /**
  * Init command that will set up the WordPress integration suite
@@ -79,6 +81,15 @@ class InitCommand extends Command
 	 * @var string
 	 */
 	private const WP_GH_TAG_URL = 'https://github.com/WordPress/wordpress-develop/archive/refs/tags/';
+
+	/**
+	 * WordPress version tags
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var string
+	 */
+	private const WP_API_TAGS = 'https://api.wordpress.org/core/stable-check/1.0/';
 
 	/**
 	 * Root path of the project
@@ -214,22 +225,30 @@ class InitCommand extends Command
 			// Find the latest tag and download that one.
 			$io->info('Downloading the latest WordPress version');
 
-			$this->downloadWPCoreAndTests($this->rootPath, 'latest');
+			try {
+				$this->downloadWPCoreAndTests('latest');
+			} catch (InvalidArgumentException $e) {
+				$io->error($e->getMessage());
 
+				return Command::FAILURE;
+			}
 
-
-
-
-
-
-
-			$io->success('WP downloaded successfully');
+			$io->success('WordPress downloaded successfully');
 			return Command::SUCCESS;
 		}
 
 		$io->info("Downloading WordPress version $wpVersion");
-		$this->downloadWPCoreAndTests($this->rootPath, $wpVersion);
+		try {
+			$this->downloadWPCoreAndTests($wpVersion);
+		} catch (InvalidArgumentException $e) {
+			$io->error($e->getMessage());
 
+			return Command::FAILURE;
+		}
+
+		$io->success('WordPress downloaded successfully');
+
+		// Copy the DB files in a correct place.
 
 
 		$io->comment('Make sure you autoload your tests in composer.json, otherwise they probably won\'t work.');
@@ -273,16 +292,50 @@ class InitCommand extends Command
 	/**
 	 * Downloads the WordPress core and test files and copies them to correct folder
 	 *
-	 * @param string $rootPath Root path of the project.
 	 * @param string $version Version to download.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
+	 * @throws InvalidArgumentException Throws an exception if the version number is not correct.
 	 */
-	private function downloadWPCoreAndTests(string $rootPath, string $version)
+	private function downloadWPCoreAndTests(string $version)
 	{
-		$wpApiInfo = json_decode(file_get_contents(self::WP_API_URL), true);
-		$latestVersion = $wpApiInfo['offers'][0]['current'];
+		if (empty($version)) {
+			$wpApiInfo = json_decode(file_get_contents(self::WP_API_URL), true);
+			$version = $wpApiInfo['offers'][0]['current'];
+		}
+
+		if (!$this->isWPVersionValid($version)) {
+			throw new InvalidArgumentException('Wrong WordPress version. Make sure the version number is correct.');
+		}
+
+		// Download a zip file, unzip it to root/wp folder and delete the .zip file.
+		$value = file_get_contents(self::WP_GH_TAG_URL . $version . 'zip');
+
+		$zip = new ZipArchive();
+
+		if ($zip->open(str_replace('//', '/', $value)) === true) {
+			$zip->extractTo($this->rootPath . DIRECTORY_SEPARATOR . 'wp');
+			$zip->close();
+		}
+	}
+
+	/**
+	 * Checks if the WordPress version is a valid one
+	 *
+	 * @param string $version Version number.
+	 *
+	 * @return bool True if the response returns correct value. False otherwise.
+	 */
+	private function isWPVersionValid(string $version): bool
+	{
+		$versions = json_decode(file_get_contents(self::WP_API_TAGS), true);
+
+		if (!isset($versions[$version])) {
+			return false;
+		};
+
+		return true;
 	}
 }
