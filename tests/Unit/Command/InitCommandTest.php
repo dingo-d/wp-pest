@@ -19,7 +19,7 @@ beforeEach(function () {
 	$ds = DIRECTORY_SEPARATOR;
 
 	// Create a mock and queue two responses.
-	$zipContents = file_get_contents(dirname(__FILE__, 3) . $ds . 'stubs' . $ds . 'hello.zip');
+	$zipContents = file_get_contents(dirname(__FILE__, 3) . $ds . 'stubs' . $ds . 'wordpress-develop-5.9.3.zip');
 
 	$mock = new MockHandler([
 		new Response(200, [], $zipContents),
@@ -117,25 +117,27 @@ it("checks that the command works ok if the plugin slug is valid", function ($sl
 ]);
 
 it("checks that the command creates folder with correct templates for a plugin", function () {
+	$ds = DIRECTORY_SEPARATOR;
 	prepareFileStubs();
 
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->addOption('plugin-slug', 'fake-plugin')
 		->execute()
+		->dump()
 		->assertSuccessful();
 
 	// Check if the files were created, as intended.
 	expect($this->outputDir)->toBeDirectory();
 
-	$testsFolder = $this->outputDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
+	$testsFolder = $this->outputDir . $ds . 'tests' . $ds;
 	$bootstrapFilePath = $testsFolder . 'bootstrap.php';
 
 	// Check if correct files are copied over.
-	expect($this->outputDir . DIRECTORY_SEPARATOR . 'phpunit.xml')->toBeReadableFile();
+	expect($this->outputDir . $ds . 'phpunit.xml')->toBeReadableFile();
 	expect($testsFolder . 'Pest.php')->toBeReadableFile();
-	expect($testsFolder . 'Unit' . DIRECTORY_SEPARATOR . 'ExampleTest.php')->toBeReadableFile();
-	expect($testsFolder . 'Integration' . DIRECTORY_SEPARATOR . 'ExampleTest.php')->toBeReadableFile();
+	expect($testsFolder . 'Unit' . $ds . 'ExampleTest.php')->toBeReadableFile();
+	expect($testsFolder . 'Integration' . $ds . 'ExampleTest.php')->toBeReadableFile();
 	expect($bootstrapFilePath)->toBeReadableFile();
 
 	// Ensure the contents of the bootstrap.php file are correct.
@@ -145,7 +147,7 @@ it("checks that the command creates folder with correct templates for a plugin",
 	expect($bootstrapContents)->toContain("require dirname(dirname(__FILE__)) . '/fake-plugin.php';");
 
 	// Check if the mock file was unzipped.
-	$wpFolderPath = $this->outputDir . DIRECTORY_SEPARATOR . 'wp' . DIRECTORY_SEPARATOR . 'hello.txt';
+	$wpFolderPath = $this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'hello.txt';
 
 	$zipContents = file_get_contents($wpFolderPath);
 	expect($zipContents)->toContain('Hi!');
@@ -210,9 +212,15 @@ it('checks that the database dropin is copied over correctly', function () {
 	TestCommand::for($this->command)
 		->addArgument('theme')
 		->execute()
+		->dump()
 		->assertSuccessful();
 
 	// Check if the files were created, as intended.
 	expect($this->outputDir . $ds . 'wp')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'src')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'hello.txt')->toBeReadableFile();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'tests')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit' . $ds . 'test.txt')->toBeReadableFile();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content' . $ds . 'db.php')->toBeReadableFile();
 });

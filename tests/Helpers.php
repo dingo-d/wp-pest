@@ -23,9 +23,9 @@ use RecursiveIteratorIterator;
  *
  * @param string $class Class name to mock.
  *
- * @return \Mockery\MockInterface
  * @since 1.0.0
  *
+ * @return \Mockery\MockInterface
  */
 function mock(string $class): MockInterface
 {
@@ -37,9 +37,9 @@ function mock(string $class): MockInterface
  *
  * @param string $dir Directory to remove.
  *
- * @return void
  * @since 1.0.0
  *
+ * @return void
  */
 function deleteOutputDir(string $dir = ''): void
 {
@@ -68,16 +68,15 @@ function deleteOutputDir(string $dir = ''): void
 /**
  * Used for setting up file_get_contents stubs
  *
- * @return void
  * @since 1.0.0
  *
+ * @return void
  */
 function prepareFileStubs(): void
 {
 	$ds = DIRECTORY_SEPARATOR;
 	$versions = file_get_contents(dirname(__FILE__) . $ds . 'stubs' . $ds . 'stable-check.json');
-	$zipPath = dirname(__FILE__) . $ds . 'stubs' . $ds . 'hello.zip';
-	$zip = file_get_contents($zipPath);
+	$zip = file_get_contents(dirname(__FILE__) . $ds . 'stubs' . $ds . 'wordpress-develop-5.9.3.zip');
 
 	// Mock file get contents. So that we don't really call the API.
 	Functions\stubs([
@@ -90,14 +89,6 @@ function prepareFileStubs(): void
 				default:
 					return file_get_contents($filename);
 			}
-		},
-		'fopen' => function ($url, $mode) use ($zipPath) {
-			switch (true) {
-				case strpos($url, InitCommand::WP_GH_TAG_URL) !== false:
-					return fopen($zipPath, $mode);
-				default:
-					return fopen($url, $mode);
-			}
-		},
+		}
 	]);
 }
