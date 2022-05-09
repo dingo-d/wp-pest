@@ -18,6 +18,7 @@
     }
   ],
   "require": {
+    "ext-json": "*",
     "ext-zip": "*",
     "php": "^7.4 || ^8.0",
     "aaemnnosttv/wp-sqlite-db": "^1.2",
