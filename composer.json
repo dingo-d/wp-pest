@@ -21,6 +21,7 @@
     "ext-zip": "*",
     "php": "^7.4 || ^8.0",
     "aaemnnosttv/wp-sqlite-db": "^1.2",
+    "guzzlehttp/guzzle": "^7.4",
     "pestphp/pest": "^1.2",
     "symfony/filesystem": "^5.4",
     "yoast/phpunit-polyfills": "^1.0",
