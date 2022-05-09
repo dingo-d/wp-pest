@@ -79,3 +79,9 @@ Underlying aim of this package (besides getting WordPress developers more acquai
 While WordPress supports PHP 5.6, it's no longer even supported with security patches (at the time of writing this PHP 7.3 is in the [EOL phase](https://www.php.net/supported-versions.php)).
 
 The WordPress community needs to move on, and if this package will help somebody to update their servers and PHP version I'll call that a success.
+
+### The script is stuck on Download WordPress part, what do I do?
+
+It's not stuck! 😂 
+
+WordPress develop has some 30MB, and downloading anything using a script can be slow, it might take over 5-10 minutes, nothing I can do about that 🤷🏼‍♂️.
