@@ -2,5 +2,6 @@
 /tests/coverage
 /tests/output/
 /wp-content
+/wp
 composer.lock
 .phpunit.result.cache
