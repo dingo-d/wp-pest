@@ -3,6 +3,10 @@
 namespace MadeByDenis\WpPestIntegrationTestSetup\Tests\Unit\Command;
 
 use Brain\Monkey;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use MadeByDenis\WpPestIntegrationTestSetup\Command\InitCommand;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Console\Test\TestCommand;
@@ -12,11 +16,22 @@ use function MadeByDenis\WpPestIntegrationTestSetup\Tests\deleteOutputDir;
 
 beforeEach(function () {
 	Monkey\setUp();
+	$ds = DIRECTORY_SEPARATOR;
 
-	$this->outputDir = dirname(__FILE__, 3) . DIRECTORY_SEPARATOR . 'output';
+	// Create a mock and queue two responses.
+	$zipContents = file_get_contents(dirname(__FILE__, 3) . $ds . 'stubs' . $ds . 'hello.zip');
+
+	$mock = new MockHandler([
+	    new Response(200, [], $zipContents),
+	]);
+
+	$handlerStack = HandlerStack::create($mock);
+	$client = new Client(['handler' => $handlerStack]);
+
+	$this->outputDir = dirname(__FILE__, 3) . $ds . 'output';
 	$this->fileSystem = new Filesystem();
 
-	$this->command = new InitCommand($this->outputDir, $this->fileSystem);
+	$this->command = new InitCommand($this->outputDir, $this->fileSystem, $client);
 });
 
 afterEach(function () {
