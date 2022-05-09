@@ -22,7 +22,7 @@ beforeEach(function () {
 	$zipContents = file_get_contents(dirname(__FILE__, 3) . $ds . 'stubs' . $ds . 'hello.zip');
 
 	$mock = new MockHandler([
-	    new Response(200, [], $zipContents),
+		new Response(200, [], $zipContents),
 	]);
 
 	$handlerStack = HandlerStack::create($mock);
