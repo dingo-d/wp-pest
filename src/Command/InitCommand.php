@@ -13,7 +13,12 @@ declare(strict_types=1);
 namespace MadeByDenis\WpPestIntegrationTestSetup\Command;
 
 use Exception;
+use FilesystemIterator;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,9 +28,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use UnexpectedValueException;
 use ZipArchive;
-
-use function PHPUnit\Framework\matches;
 
 /**
  * Init command that will set up the WordPress integration suite
@@ -111,6 +115,15 @@ class InitCommand extends Command
 	protected static $defaultName = 'setup';
 
 	/**
+	 * Client instance property
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var ClientInterface
+	 */
+	private ClientInterface $client;
+
+	/**
 	 * Command class constructor
 	 *
 	 * @since 1.0.0
@@ -118,10 +131,11 @@ class InitCommand extends Command
 	 * @param string $rootPath Root path of the project.
 	 * @param Filesystem $filesystem Symfony filesystem dependency.
 	 */
-	public function __construct(string $rootPath, Filesystem $filesystem)
+	public function __construct(string $rootPath, Filesystem $filesystem, ClientInterface $client)
 	{
 		$this->rootPath = $rootPath;
 		$this->filesystem = $filesystem;
+		$this->client = $client;
 
 		parent::__construct();
 	}
@@ -200,7 +214,7 @@ class InitCommand extends Command
 
 		$wpVersion = $input->getOption(self::WP_VERSION);
 
-		$io->info('Attempting to create tests folder');
+		$io->text('Attempting to create tests folder');
 
 		$testsDir = $this->rootPath . $ds . 'tests';
 		$wpDir = $this->rootPath . $ds . 'wp';
@@ -235,15 +249,20 @@ class InitCommand extends Command
 
 		if ($wpVersion === 'latest') {
 			// Find the latest tag and download that one.
-			$io->text('Downloading the latest WordPress version. This may take a while...');
+			$io->text('Downloading the latest WordPress version. This may take a while, grab a coffee or tee 🍵...');
 
-			// Latest tag cannot throw exception, so no need to wrap it in try/catch.
-			$this->downloadWPCoreAndTests('latest');
+			try {
+				$this->downloadWPCoreAndTests('latest');
+			} catch (Exception $e) {
+				$io->error($e->getMessage());
+
+				return Command::FAILURE;
+			}
 
 			$io->success('WordPress downloaded successfully.');
 		} else {
 			// @phpstan-ignore-next-line
-			$io->text("Downloading WordPress version $wpVersion. This may take a while...");
+			$io->text("Downloading WordPress version $wpVersion. This may take a while, grab a coffee or tee 🍵...");
 
 			try {
 				// @phpstan-ignore-next-line
@@ -257,6 +276,9 @@ class InitCommand extends Command
 			$io->success('WordPress downloaded successfully.');
 		}
 
+		// Extract will extract the file to a folder like wp/wordpress-develop-X.Y.Z
+		// we need to move all files up one level.
+
 		/**
 		 * Copy the DB files in a correct place.
 		 *
@@ -264,11 +286,11 @@ class InitCommand extends Command
 		 * will be copied in the project root (kinda annoying). So we need to manually clean that folder.
 		 */
 		$packageDropin = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
-		$coreDropinPath = $this->rootPath . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content' . $ds;
-		$coreDropin = $coreDropinPath . 'db.php';
+		$coreDropinPath = $this->rootPath . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content';
+		$coreDropin = $coreDropinPath . $ds . 'db.php';
 
 		// This is a dirty hack so that the test pass.
-		if ($_ENV['WP_PEST_TESTING']) {
+		if (isset($_ENV['WP_PEST_TESTING']) && $_ENV['WP_PEST_TESTING']) {
 			$packageDropin = dirname($this->rootPath, 2) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
 		}
 
@@ -277,11 +299,11 @@ class InitCommand extends Command
 		}
 
 		$this->filesystem->copy($packageDropin, $coreDropin);
-		$this->filesystem->remove($this->rootPath . $ds . 'wp-content');
+//		$this->filesystem->remove($this->rootPath . $ds . 'wp-content'); // Should I create a separate command for this?
 
 		$io->success('Database dropin copied successfully.');
 
-		$io->comment("Make sure you autoload your tests in composer.json, otherwise they probably won't work.");
+		$io->info("Make sure you autoload your tests in composer.json, otherwise they probably won't work.");
 		return Command::SUCCESS;
 	}
 
@@ -338,7 +360,7 @@ class InitCommand extends Command
 	 * @throws InvalidArgumentException Throws an exception if the version number is not correct.
 	 * @throws RuntimeException Throws an exception if the file download fails.
 	 */
-	private function downloadWPCoreAndTests(string $version)
+	private function downloadWPCoreAndTests(string $version): void
 	{
 		if ($version === 'latest') {
 			$wpVersions = (array) json_decode((string) file_get_contents(self::WP_API_TAGS), true);
@@ -359,19 +381,31 @@ class InitCommand extends Command
 		$zipName = $this->rootPath . DIRECTORY_SEPARATOR . "wordpress-develop-$version.zip";
 
 		try {
-			$this->downloadFile(self::WP_GH_TAG_URL . $version . '.zip', $zipName);
-		} catch (\RuntimeException $e) {
+			ini_set('memory_limit', '1536M'); // Safeguard.
+			$this->client->request('GET', self::WP_GH_TAG_URL . $version . '.zip', ['sink' => $zipName]);
+		} catch (GuzzleException $e) {
 			throw new RuntimeException('Failed opening remote file');
 		}
 
 		$zip = new ZipArchive();
 
 		if ($zip->open($zipName)) {
-			$zip->extractTo($this->rootPath . DIRECTORY_SEPARATOR . 'wp');
+			$extractSuccessful = $zip->extractTo($this->rootPath . DIRECTORY_SEPARATOR . 'wp');
+
+			if (!$extractSuccessful) {
+				throw new RuntimeException('Failed extracting zip file');
+			}
+
 			$zip->close();
 		}
 
 		unlink($zipName);
+
+		// Loop through all the folder contents, and copy them to the wp/ folder.
+		$folderToCopyTo = $this->rootPath . DIRECTORY_SEPARATOR . 'wp';
+		$folderToCheck = $folderToCopyTo . DIRECTORY_SEPARATOR . "wordpress-develop-$version";
+
+		$this->moveFilesUpOneFolder($folderToCheck, $folderToCopyTo);
 	}
 
 	/**
@@ -418,37 +452,46 @@ class InitCommand extends Command
 	}
 
 	/**
-	 * Download a file from a remote source
+	 * Move all files from the zip file up one folder
 	 *
-	 * @link https://stackoverflow.com/a/3938844/629127
+	 * @param string $folderToCheck Folder containing files and folders.
+	 * @param string $folderToCopyTo Folder where files and folders should be copied to.
 	 *
-	 * @param string $url Url to download from.
-	 * @param string $path Path of the file to download to.
+	 * @since 1.0.0
 	 *
 	 * @return void
-	 * @throws RuntimeException Throws an exception if the file download fails.
 	 */
-	private function downloadFile(string $url, string $path): void
+	private function moveFilesUpOneFolder(string $folderToCheck, string $folderToCopyTo): void
 	{
-		$file = fopen($url, 'rb');
-		$numberOfBytesToRead = 1024 * 1024 * 4;
-
-		if (!$file) {
-			throw new RuntimeException('Failed opening remote file');
+		if (!\is_dir($folderToCheck)) {
+			return;
 		}
 
-		$newFile = fopen($path, 'wb');
+		try {
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($folderToCheck, FilesystemIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::SELF_FIRST
+			);
+		} catch (UnexpectedValueException $exception) {
+			throw new RuntimeException('Error while instantiating recursive iterator.');
+		}
 
-		if ($newFile) {
-			while (!feof($file)) {
-				fwrite($newFile, (string) fread($file, $numberOfBytesToRead));
+		$ds = \DIRECTORY_SEPARATOR;
+
+		foreach ($iterator as $item) {
+			$subPathName = $iterator->getSubPathname();
+			$destinationPath = \rtrim($folderToCopyTo, $ds) . $ds . $subPathName;
+
+			if ($item->isDir()) { // @phpstan-ignore-line
+				if (!\file_exists($destinationPath)) {
+					\mkdir($destinationPath, 0755, true);
+				}
+			} else {
+				\copy($item->getPathname(), $destinationPath); // @phpstan-ignore-line
 			}
 		}
 
-		fclose($file);
-
-		if ($newFile) {
-			fclose($newFile);
-		}
+		// Delete the folder we don't need anymore.
+		$this->filesystem->remove($folderToCheck);
 	}
 }
