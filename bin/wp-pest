@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Client;
 use MadeByDenis\WpPestIntegrationTestSetup\Command\InitCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Filesystem\Filesystem;
@@ -29,6 +30,6 @@ $rootPath = dirname($autoloadPath, 2);
 
 $app = new Application();
 
-$app->add(new InitCommand($rootPath, new Filesystem()));
+$app->add(new InitCommand($rootPath, new Filesystem(), new Client()));
 
 $app->run();
