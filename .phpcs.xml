@@ -18,6 +18,7 @@
 	<!-- Exclude Composer vendor directory. -->
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/wp-content/*</exclude-pattern>
+	<exclude-pattern>*/wp/*</exclude-pattern>
 
 	<!-- Check for cross-version support for PHP 7.4 and higher. -->
 	<config name="testVersion" value="7.4-"/>
