@@ -307,7 +307,7 @@ class InitCommand extends Command
 		}
 
 		$io->success("All done! Go and write tests 😄");
-		
+
 		return Command::SUCCESS;
 	}
 
