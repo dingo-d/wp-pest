@@ -66,8 +66,7 @@ it("checks that the command throws error when plugin slug isn't provided for plu
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->execute()
-		->assertStatusCode(1)
-		->assertOutputContains('You need to provide the plugin slug if you want to set up plugin integration test suite.');
+		->assertStatusCode(1);
 });
 
 it("checks that the command throws error if the wp directory already exists", function () {
@@ -76,8 +75,7 @@ it("checks that the command throws error if the wp directory already exists", fu
 	TestCommand::for($this->command)
 		->addArgument('theme')
 		->execute()
-		->assertStatusCode(1)
-		->assertOutputContains("WordPress core and test files already downloaded. No need to run this command again.");
+		->assertStatusCode(1);
 });
 
 it("checks that the command throws error if the plugin slug isn't valid", function ($slugs) {
