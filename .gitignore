@@ -5,3 +5,6 @@
 /wp
 composer.lock
 .phpunit.result.cache
+
+# Ignore the stub zip file, we need this.
+!/tests/stubs/wordpress-develop-5.9.3.zip
