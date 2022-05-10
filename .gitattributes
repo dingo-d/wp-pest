@@ -16,6 +16,7 @@ phpstan.neon export-ignore
 phpunit.xml export-ignore
 CHANGELOG.md export-ignore
 README.md export-ignore
+SECURITY.md export-ignore
 
 #
 # Auto detect text files and perform LF normalization
