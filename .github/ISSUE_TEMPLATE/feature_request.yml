@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest a new feature for this package
+labels: ["feature request"]
+assignees: dingo-d
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Hi there! We see that you like this project and you have some ideas. This means a lot because it helps me improve it even more :)
+    - type: textarea
+      attributes:
+          label: Describe your feature request
+          description: Please write a clear and concise description of what the problem is.
+          placeholder: |
+              Example. I'm always frustrated when...
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Describe the solution you'd like
+          description: Please write a clear and concise description of what you want to happen.
+          placeholder: |
+              Example. With this feature I will be able to...
+      validations:
+          required: true
+
+    - type: dropdown
+      id: existing
+      attributes:
+          label: Please confirm that you have searched existing issues and discussions about this feature.
+          description: You can do this by searching https://github.com/dingo-d/wp-pest-integration-test-setup/issues and https://github.com/dingo-d/wp-pest-integration-test-setup/discussions.
+          multiple: false
+          options:
+             - 'Yes'
+             - 'No'
+      validations:
+          required: true

@@ -1,0 +1,71 @@
+name: Bug report
+description: Report a potential bug with the project
+labels: [bug]
+assignees: dingo-d
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Hi there! We see that you like this project and you have found a bug. This means a lot because it helps me improve it even more :)
+    - type: textarea
+      attributes:
+          label: Describe your bug
+          description: Please write a clear and concise description of what the bug is.
+          placeholder: |
+              Example. When I try to do this, I get this and it should be this...
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Steps to Reproduce
+          description: Provide a link to a live example, or an unambiguous set of steps to reproduce this bug. Include code to reproduce, that means a lot to me.
+          placeholder: |
+              1.
+              2.
+              3.
+              4.
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Expected behavior
+          description: Please write a clear and concise description of what you expected to happen.
+          placeholder: |
+              Example. I should get this...
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Screenshots, screen recording, code snippet
+          description: |
+              If possible, please upload a screenshot or screen recording which demonstrates your bug.
+      validations:
+          required: false
+
+    - type: textarea
+      attributes:
+          label: Environment info
+          description: |
+               Please include as many relevant details about the environment you are working on.
+          placeholder: |
+            - OS version
+            - PHP version
+            - Composer version
+            - IDE (if relevant)
+      validations:
+          required: false
+
+    - type: dropdown
+      id: existing
+      attributes:
+          label: Please confirm that you have searched existing issues in this repo.
+          description: You can do this by searching https://github.com/dingo-d/wp-pest-integration-test-setup/issues.
+          multiple: false
+          options:
+             - 'Yes'
+             - 'No'
+      validations:
+          required: true
