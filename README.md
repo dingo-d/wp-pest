@@ -34,7 +34,7 @@ This will set up the `tests` folder, download the latest version of [WordPress d
 There are other options you can choose from by typing
 
 ```bash
-vendor/bin/wp-pest --help
+vendor/bin/wp-pest setup --help
 ```
 
 ```bash
@@ -58,18 +58,58 @@ Options:
   -v|vv|vvv, --verbose             Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Help:
-  This command helps you set up WordPress integration and unit test suite.
+  This command helps you set up WordPress integration and unit test suites.
 ```
-
-You can set up only unit test suite, but this library is more aimed at integration testing.
 
 ## Under the hood
 
 For an in-depth reasoning and explanation of how this package came to be, you can read [this article](https://madebydenis.com/wordpress-integration-tests-with-pest-php/).
 
-Basically what's "under the hood" is downloaded [wordpress-develop](https://github.com/WordPress/wordpress-develop) to your project, added an in memory DB (sql lite from [aaemnnosttv/wp-sqlite-db](https://github.com/aaemnnosttv/wp-sqlite-db)), and a base test class from [Yoast/wp-test-utils](https://github.com/Yoast/wp-test-utils). All that combined allows you to run integration tests in WordPress with Pest PHP.
+Basically what's "under the hood" is downloaded [wordpress-develop](https://github.com/WordPress/wordpress-develop) repository to your project, added an in memory DB (sql lite from [aaemnnosttv/wp-sqlite-db](https://github.com/aaemnnosttv/wp-sqlite-db)), and a base test class from [Yoast/wp-test-utils](https://github.com/Yoast/wp-test-utils). All that combined allows you to run integration tests in WordPress with Pest PHP without any additional setup.
 
 ## Test example
+
+The command will set up two examples - one for unit test, one for integration test.
+
+Running:
+
+```bash
+vendor/bin/pest --group=unit
+```
+
+will run unit test:
+
+```bash
+   PASS  Tests\Unit\ExampleTest
+  ✓ example
+
+  Tests:  1 passed
+  Time:   0.02s
+```
+
+and running:
+
+```bash
+vendor/bin/pest --group=integration
+```
+
+will run integration tests:
+
+```bash
+Installing...
+Running as single site... To run multisite, use -c tests/phpunit/multisite.xml
+Not running ajax tests. To execute these, use --group ajax.
+Not running ms-files tests. To execute these, use --group ms-files.
+Not running external-http tests. To execute these, use --group external-http.
+
+   PASS  Tests\Integration\ExampleTest
+  ✓ Rest API endpoints work
+
+  Tests:  1 passed
+  Time:   0.14s
+```
+
+The test suites are grouped together, and it's necessary to pass the `--group=integration` option if you want to run integration tests, because that way the bootstrap knows to load integration test specific configuration when running tests.
 
 ## Questions
 
@@ -84,4 +124,12 @@ The WordPress community needs to move on, and if this package will help somebody
 
 It's not stuck! 😂 
 
-WordPress develop has some 30MB, and downloading anything using a script can be slow, it might take over 5-10 minutes, nothing I can do about that 🤷🏼‍♂️.
+You're probably running this in WSL, right. For some reason, download on WSL terminal _can_ be slow. When I tested it , it took me some 5-10 minutes to download 30MB file. It took me some 10 seconds on Mac 🤷🏼‍♂️.  
+
+### It's not working on Windows
+
+I haven't tested it yet on native Windows installation. This is on my to do list.
+
+### Something is not working
+
+Please do [open an issue](/issues) for that.
