@@ -67,7 +67,7 @@ it("checks that the command throws error when plugin slug isn't provided for plu
 		->addArgument('plugin')
 		->execute()
 		->assertStatusCode(1)
-		->assertOutputContains("You need to provide the plugin slug if you want to set up plugin integration test suite.");
+		->assertOutputContains('You need to provide the plugin slug if you want to set up plugin integration test suite.');
 });
 
 it("checks that the command throws error if the wp directory already exists", function () {
@@ -219,10 +219,16 @@ it('checks that the database dropin is copied over correctly', function () {
 	expect($this->outputDir . $ds . 'wp')->toBeDirectory();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src')->toBeDirectory();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'hello.txt')->toBeReadableFile();
-	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'hello.txt')->toContain('Hi!');
+
+	$helloContents = file_get_contents($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'hello.txt');
+	expect($helloContents)->toContain('Hi!');
+
 	expect($this->outputDir . $ds . 'wp' . $ds . 'tests')->toBeDirectory();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit')->toBeDirectory();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit' . $ds . 'test.txt')->toBeReadableFile();
-	expect($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit' . $ds . 'test.txt')->toContain('This is a test!');
+
+	$testContents = file_get_contents($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit' . $ds . 'test.txt');
+	expect($testContents)->toContain('This is a test!');
+
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content' . $ds . 'db.php')->toBeReadableFile();
 });

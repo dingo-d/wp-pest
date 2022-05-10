@@ -15,6 +15,7 @@ use FilesystemIterator;
 use MadeByDenis\WpPestIntegrationTestSetup\Command\InitCommand;
 use Mockery;
 use Mockery\MockInterface;
+use Mockery\LegacyMockInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -25,9 +26,9 @@ use RecursiveIteratorIterator;
  *
  * @since 1.0.0
  *
- * @return \Mockery\MockInterface
+ * @return MockInterface|LegacyMockInterface
  */
-function mock(string $class): MockInterface
+function mock(string $class)
 {
 	return Mockery::mock($class);
 }
