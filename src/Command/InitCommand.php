@@ -106,15 +106,6 @@ class InitCommand extends Command
 	private Filesystem $filesystem;
 
 	/**
-	 * Command name property
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var string Command name.
-	 */
-	protected static $defaultName = 'setup';
-
-	/**
 	 * Client instance property
 	 *
 	 * @since 1.0.0
@@ -122,6 +113,15 @@ class InitCommand extends Command
 	 * @var ClientInterface
 	 */
 	private ClientInterface $client;
+
+	/**
+	 * Command name property
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var string Command name.
+	 */
+	protected static $defaultName = 'setup';
 
 	/**
 	 * Command class constructor
@@ -249,7 +249,7 @@ class InitCommand extends Command
 
 		if ($wpVersion === 'latest') {
 			// Find the latest tag and download that one.
-			$io->text('Downloading the latest WordPress version. This may take a while, grab a coffee ☕️ or tea 🍵...');
+			$io->text('Downloading the latest WordPress version. This may take a while, grab a coffee or tea 🍵...');
 
 			try {
 				$this->downloadWPCoreAndTests('latest');
@@ -258,11 +258,9 @@ class InitCommand extends Command
 
 				return Command::FAILURE;
 			}
-
-			$io->success('WordPress downloaded successfully.');
 		} else {
 			// @phpstan-ignore-next-line
-			$io->text("Downloading WordPress version $wpVersion. This may take a while, grab a coffee ☕️ or tea 🍵...");
+			$io->text("Downloading WordPress version $wpVersion. This may take a while, grab a coffee️ or tea 🍵...");
 
 			try {
 				// @phpstan-ignore-next-line
@@ -272,9 +270,8 @@ class InitCommand extends Command
 
 				return Command::FAILURE;
 			}
-
-			$io->success('WordPress downloaded successfully.');
 		}
+		$io->success('WordPress downloaded successfully.');
 
 		// Extract will extract the file to a folder like wp/wordpress-develop-X.Y.Z
 		// we need to move all files up one level.
@@ -285,20 +282,20 @@ class InitCommand extends Command
 		 * Because the DB package is a WP drop-in, that means that the folder `wp-content/wp-sqlite-db`
 		 * will be copied in the project root (kinda annoying). So we need to manually clean that folder later.
 		 */
-		$packageDropin = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
-		$coreDropinPath = $this->rootPath . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content';
-		$coreDropin = $coreDropinPath . $ds . 'db.php';
+		$packageDropIn = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+		$coreDropInPath = $this->rootPath . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content';
+		$coreDropIn = $coreDropInPath . $ds . 'db.php';
 
 		// This is a dirty hack so that the test pass.
 		if (isset($_ENV['WP_PEST_TESTING']) && $_ENV['WP_PEST_TESTING']) {
-			$packageDropin = dirname($this->rootPath, 2) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+			$packageDropIn = dirname($this->rootPath, 2) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
 		}
 
-		if (!$this->filesystem->exists($coreDropinPath)) {
-			$this->filesystem->mkdir($coreDropinPath);
+		if (!$this->filesystem->exists($coreDropInPath)) {
+			$this->filesystem->mkdir($coreDropInPath);
 		}
 
-		$this->filesystem->copy($packageDropin, $coreDropin);
+		$this->filesystem->copy($packageDropIn, $coreDropIn);
 
 		$io->success('Database drop-in copied successfully.');
 
@@ -309,7 +306,8 @@ class InitCommand extends Command
 			$io->success('Database drop-in folder deleted successfully.');
 		}
 
-		$io->info("Make sure you autoload your tests in composer.json, otherwise they probably won't work.");
+		$io->success("All done! Go and write tests 😄");
+		
 		return Command::SUCCESS;
 	}
 
@@ -434,7 +432,7 @@ class InitCommand extends Command
 
 		if (!isset($versions[$version])) {
 			return false;
-		};
+		}
 
 		return true;
 	}
@@ -469,7 +467,7 @@ class InitCommand extends Command
 	 */
 	private function moveFilesUpOneFolder(string $folderToCheck, string $folderToCopyTo): void
 	{
-		if (!\is_dir($folderToCheck)) {
+		if (!is_dir($folderToCheck)) {
 			return;
 		}
 
@@ -482,18 +480,18 @@ class InitCommand extends Command
 			throw new RuntimeException('Error while instantiating recursive iterator.');
 		}
 
-		$ds = \DIRECTORY_SEPARATOR;
+		$ds = DIRECTORY_SEPARATOR;
 
 		foreach ($iterator as $item) {
 			$subPathName = $iterator->getSubPathname();
-			$destinationPath = \rtrim($folderToCopyTo, $ds) . $ds . $subPathName;
+			$destinationPath = rtrim($folderToCopyTo, $ds) . $ds . $subPathName;
 
 			if ($item->isDir()) { // @phpstan-ignore-line
-				if (!\file_exists($destinationPath)) {
-					\mkdir($destinationPath, 0755, true);
+				if (!file_exists($destinationPath)) {
+					mkdir($destinationPath, 0755, true);
 				}
 			} else {
-				\copy($item->getPathname(), $destinationPath); // @phpstan-ignore-line
+				copy($item->getPathname(), $destinationPath); // @phpstan-ignore-line
 			}
 		}
 
