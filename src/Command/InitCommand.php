@@ -151,7 +151,7 @@ class InitCommand extends Command
 	{
 		$this
 			->setDescription('Sets up the test suites.')
-			->setHelp('This command helps you set up WordPress integration and unit test suite.')
+			->setHelp('This command helps you set up WordPress integration and unit test suites.')
 			->addArgument(
 				self::PROJECT_TYPE,
 				InputArgument::REQUIRED,
