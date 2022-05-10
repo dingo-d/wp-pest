@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+    - name: General help request
+      url: https://github.com/dingo-d/wp-pest-integration-test-setup/discussions/categories/general
+      about: For general help requests, create a new topic in the General discussion forum
+    - name: Q&A
+      url: https://github.com/dingo-d/wp-pest-integration-test-setup/discussions/categories/q-a
+      about: For more technical help requests, create a new topic in the Q&A discussion forum

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+		 bootstrap="vendor/autoload.php"
+		 colors="true"
+>
+	<testsuites>
+		<testsuite name="Unit Test Suite">
+			<directory>./tests/Unit/</directory>
+		</testsuite>
+	</testsuites>
+	<php>
+        <env name="WP_PEST_TESTING" value="true" force="true" />
+	</php>
+	<coverage processUncoveredFiles="true">
+		<include>
+			<directory suffix=".php">./src</directory>
+		</include>
+		<report>
+			<clover outputFile="tests/coverage/clover.xml"/>
+			<html outputDirectory="tests/coverage/html" lowUpperBound="50" highLowerBound="90"/>
+		</report>
+	</coverage>
+</phpunit>
