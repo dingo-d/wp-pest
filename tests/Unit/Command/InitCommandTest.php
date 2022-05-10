@@ -219,8 +219,10 @@ it('checks that the database dropin is copied over correctly', function () {
 	expect($this->outputDir . $ds . 'wp')->toBeDirectory();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src')->toBeDirectory();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'hello.txt')->toBeReadableFile();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'hello.txt')->toContain('Hi!');
 	expect($this->outputDir . $ds . 'wp' . $ds . 'tests')->toBeDirectory();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit')->toBeDirectory();
 	expect($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit' . $ds . 'test.txt')->toBeReadableFile();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'tests' . $ds . 'phpunit' . $ds . 'test.txt')->toContain('This is a test!');
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content' . $ds . 'db.php')->toBeReadableFile();
 });
