@@ -249,7 +249,7 @@ class InitCommand extends Command
 
 		if ($wpVersion === 'latest') {
 			// Find the latest tag and download that one.
-			$io->text('Downloading the latest WordPress version. This may take a while, grab a coffee or tee 🍵...');
+			$io->text('Downloading the latest WordPress version. This may take a while, grab a coffee ☕️ or tea 🍵...');
 
 			try {
 				$this->downloadWPCoreAndTests('latest');
@@ -262,7 +262,7 @@ class InitCommand extends Command
 			$io->success('WordPress downloaded successfully.');
 		} else {
 			// @phpstan-ignore-next-line
-			$io->text("Downloading WordPress version $wpVersion. This may take a while, grab a coffee or tee 🍵...");
+			$io->text("Downloading WordPress version $wpVersion. This may take a while, grab a coffee ☕️ or tea 🍵...");
 
 			try {
 				// @phpstan-ignore-next-line
@@ -282,8 +282,8 @@ class InitCommand extends Command
 		/**
 		 * Copy the DB files in a correct place.
 		 *
-		 * Because the DB package is a WP dropin, that means that the folder `wp-content/wp-sqlite-db`
-		 * will be copied in the project root (kinda annoying). So we need to manually clean that folder.
+		 * Because the DB package is a WP drop-in, that means that the folder `wp-content/wp-sqlite-db`
+		 * will be copied in the project root (kinda annoying). So we need to manually clean that folder later.
 		 */
 		$packageDropin = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
 		$coreDropinPath = $this->rootPath . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content';
@@ -299,9 +299,15 @@ class InitCommand extends Command
 		}
 
 		$this->filesystem->copy($packageDropin, $coreDropin);
-//		$this->filesystem->remove($this->rootPath . $ds . 'wp-content'); // Should I create a separate command for this?
 
-		$io->success('Database dropin copied successfully.');
+		$io->success('Database drop-in copied successfully.');
+
+		$cleanDbPackage = $io->confirm('Do you want to clean the DB package folder?', false);
+
+		if ($cleanDbPackage) {
+			$this->filesystem->remove($this->rootPath . $ds . 'wp-content');
+			$io->success('Database drop-in folder deleted successfully.');
+		}
 
 		$io->info("Make sure you autoload your tests in composer.json, otherwise they probably won't work.");
 		return Command::SUCCESS;
