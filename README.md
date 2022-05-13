@@ -26,7 +26,7 @@ composer require dingo-d/wp-pest-integration-test-setup --dev
 After that you can run the following command:
 
 ```bash
-vendor/bin/wp-pest theme
+vendor/bin/wp-pest setup theme
 ```
 
 This will set up the `tests` folder, download the latest version of [WordPress develop](https://github.com/WordPress/wordpress-develop/) repo and place it in `wp` folder. It will also set up your integration and unit test suites with an example that you can run in your theme.
