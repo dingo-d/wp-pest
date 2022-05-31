@@ -81,11 +81,12 @@ class InitCommand extends Command
 	/**
 	 * WordPress version tags
 	 *
+	 * @since 1.3.0 Change the URL of the API tags to GH one.
 	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
-	public const WP_API_TAGS = 'https://api.wordpress.org/core/stable-check/1.0/';
+	public const WP_API_TAGS = 'https://api.github.com/repos/WordPress/wordpress-develop/git/matching-refs/tags';
 
 	/**
 	 * Root path of the project
@@ -253,7 +254,7 @@ class InitCommand extends Command
 
 			try {
 				$this->downloadWPCoreAndTests('latest');
-			} catch (Exception $e) {
+			} catch (Exception | GuzzleException $e) {
 				$io->error($e->getMessage());
 
 				return Command::FAILURE;
@@ -265,7 +266,7 @@ class InitCommand extends Command
 			try {
 				// @phpstan-ignore-next-line
 				$this->downloadWPCoreAndTests($wpVersion);
-			} catch (Exception $e) {
+			} catch (Exception | GuzzleException $e) {
 				$io->error($e->getMessage());
 
 				return Command::FAILURE;
@@ -358,17 +359,22 @@ class InitCommand extends Command
 	 *
 	 * @param string $version Version to download.
 	 *
-	 * @since 1.0.0
-	 *
 	 * @return void
+	 *
 	 * @throws InvalidArgumentException Throws an exception if the version number is not correct.
 	 * @throws RuntimeException Throws an exception if the file download fails.
+	 * @throws GuzzleException Throws an exception if the file download fails.
+	 *
+	 * @since 1.3.0 Change the way GH tags are fetched.
+	 * @since 1.0.0
+	 *
 	 */
 	private function downloadWPCoreAndTests(string $version): void
 	{
+		$versions = $this->getGitHubTags();
+
 		if ($version === 'latest') {
-			$wpVersions = (array) json_decode((string) file_get_contents(self::WP_API_TAGS), true);
-			$version = array_key_last($wpVersions);
+			$version = end($versions);
 		} else {
 			/**
 			 * Only validate if the parameter was passed.
@@ -417,24 +423,18 @@ class InitCommand extends Command
 	 *
 	 * @param string $version Version number.
 	 *
+	 * @since 1.3.0 Changed the logic of checking the existing tags.
 	 * @since 1.0.0
 	 *
 	 * @return bool True if the response returns correct value. False otherwise.
 	 */
 	private function isWPVersionValid(string $version): bool
 	{
-		// Memoization.
-		static $versions;
-
-		if (empty($versions)) {
-			$versions = json_decode((string) file_get_contents(self::WP_API_TAGS), true);
-		}
-
-		if (!isset($versions[$version])) {
+		try {
+			return in_array($version, $this->getGitHubTags());
+		} catch (GuzzleException $e) {
 			return false;
 		}
-
-		return true;
 	}
 
 	/**
@@ -497,5 +497,49 @@ class InitCommand extends Command
 
 		// Delete the folder we don't need anymore.
 		$this->filesystem->remove($folderToCheck);
+	}
+
+	/**
+	 * Get all the tags from the GitHub
+	 *
+	 * @return string[] List of all the available GitHub tagged versions.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @throws GuzzleException Exception in case of Guzzle error.
+	 */
+	private function getGitHubTags(): array
+	{
+		static $versions;
+
+		if (empty($versions)) {
+			$response = $this->client->request(
+				'GET',
+				self::WP_API_TAGS,
+				[
+					'Accept' => 'application/vnd.github.v3+json'
+				]
+			);
+
+			if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+				return [];
+			}
+
+			$contents = $response->getBody()->getContents();
+
+			$refArray = (array) json_decode($contents, true);
+
+			$versions = array_map(static function ($refInfo) {
+				if (!is_array($refInfo)) {
+					return '';
+				}
+
+				$reference = $refInfo['ref'] ?? '';
+				preg_match_all('/[\d.]*$/', $reference, $matchNumber, PREG_SET_ORDER);
+				return $matchNumber[0][0] ?? '';
+			}, $refArray);
+		}
+
+		return $versions;
 	}
 }
