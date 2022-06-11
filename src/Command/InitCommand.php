@@ -68,6 +68,15 @@ class InitCommand extends Command
 	private const PLUGIN_SLUG = 'plugin-slug';
 
 	/**
+	 * Skip wp-content folder delete option string
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var string
+	 */
+	private const SKIP_DELETE = 'skip-delete';
+
+	/**
 	 * WordPress GitHub tag zip url
 	 *
 	 * At the end there needs to go the version followed by .zip in order to fetch the contents.
@@ -144,6 +153,7 @@ class InitCommand extends Command
 	/**
 	 * Configures the current command
 	 *
+	 * @since 1.4.0 Add option to skip deletion of the wp-content folder.
 	 * @since 1.0.0
 	 *
 	 * @return void
@@ -170,6 +180,12 @@ class InitCommand extends Command
 				null,
 				InputOption::VALUE_OPTIONAL,
 				'If you are setting the plugin tests provide the plugin slug.'
+			)
+			->addOption(
+				self::SKIP_DELETE,
+				null,
+				InputOption::VALUE_NONE,
+				'If you are running the setup tests in a CI pipeline, provide this option to skip the deletion step.'
 			);
 	}
 
@@ -272,6 +288,7 @@ class InitCommand extends Command
 				return Command::FAILURE;
 			}
 		}
+
 		$io->success('WordPress downloaded successfully.');
 
 		// Extract will extract the file to a folder like wp/wordpress-develop-X.Y.Z
@@ -299,6 +316,14 @@ class InitCommand extends Command
 		$this->filesystem->copy($packageDropIn, $coreDropIn);
 
 		$io->success('Database drop-in copied successfully.');
+
+		$skipDelete = $input->getOption(self::SKIP_DELETE);
+
+		if ($skipDelete) {
+			$io->success("All done! Go and write tests 😄");
+
+			return Command::SUCCESS;
+		}
 
 		$cleanDbPackage = $io->confirm('Do you want to clean the DB package folder?', false);
 

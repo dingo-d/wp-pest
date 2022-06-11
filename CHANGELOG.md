@@ -8,6 +8,12 @@ This projects adheres to [Semantic Versioning](https://semver.org/) and [Keep a 
 
 _No documentation available about unreleased changes as of yet._
 
+## [1.4.0] Update command for CI/CD runs
+
+### Added
+- Add option to avoid the prompt at the end of the setup command
+  - This caused issue in CI/CD pipelines where the setup command would just hang without confirmation. 
+
 ## [1.3.0] Tags check update
 
 ### Fixed
@@ -34,6 +40,7 @@ _No documentation available about unreleased changes as of yet._
 - Added the functionality for the WordPress integration tests with PestPHP package.
 
 [Unreleased]: https://github.com/dingo-d/wp-pest-integration-test-setup/compare/main...HEAD
+[1.4.0]: https://github.com/https://github.com/dingo-d/wp-pest-integration-test-setup/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/https://github.com/dingo-d/wp-pest-integration-test-setup/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/https://github.com/dingo-d/wp-pest-integration-test-setup/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/https://github.com/dingo-d/wp-pest-integration-test-setup/compare/1.0.0...1.1.0
