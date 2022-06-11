@@ -4,26 +4,19 @@ namespace MadeByDenis\WpPestIntegrationTestSetup\Tests\Unit\Command;
 
 use Brain\Monkey;
 use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
 use MadeByDenis\WpPestIntegrationTestSetup\Command\InitCommand;
+use MadeByDenis\WpPestIntegrationTestSetup\Tests\Mocks\CustomMockHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Console\Test\TestCommand;
 
-use function MadeByDenis\WpPestIntegrationTestSetup\Tests\prepareFileStubs;
 use function MadeByDenis\WpPestIntegrationTestSetup\Tests\deleteOutputDir;
 
 beforeEach(function () {
 	Monkey\setUp();
 	$ds = DIRECTORY_SEPARATOR;
 
-	// Create a mock and queue two responses.
-	$zipContents = file_get_contents(dirname(__FILE__, 3) . $ds . 'stubs' . $ds . 'wordpress-develop-5.9.3.zip');
-
-	$mock = new MockHandler([
-		new Response(200, [], $zipContents),
-	]);
+	$mock = new CustomMockHandler();
 
 	$handlerStack = HandlerStack::create($mock);
 	$client = new Client(['handler' => $handlerStack]);
@@ -79,7 +72,6 @@ it("checks that the command throws error if the wp directory already exists", fu
 });
 
 it("checks that the command throws error if the plugin slug isn't valid", function ($slugs) {
-	prepareFileStubs();
 
 	TestCommand::for($this->command)
 		->addArgument('plugin')
@@ -101,7 +93,6 @@ it("checks that the command throws error if the plugin slug isn't valid", functi
 ]);
 
 it("checks that the command works ok if the plugin slug is valid", function ($slugs) {
-	prepareFileStubs();
 
 	TestCommand::for($this->command)
 		->addArgument('plugin')
@@ -116,13 +107,11 @@ it("checks that the command works ok if the plugin slug is valid", function ($sl
 
 it("checks that the command creates folder with correct templates for a plugin", function () {
 	$ds = DIRECTORY_SEPARATOR;
-	prepareFileStubs();
 
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->addOption('plugin-slug', 'fake-plugin')
 		->execute()
-		->dump()
 		->assertSuccessful();
 
 	// Check if the files were created, as intended.
@@ -152,7 +141,6 @@ it("checks that the command creates folder with correct templates for a plugin",
 });
 
 it("checks that the command creates folder with correct templates for a theme", function () {
-	prepareFileStubs();
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
@@ -174,7 +162,6 @@ it("checks that the command creates folder with correct templates for a theme", 
 });
 
 it("checks that attempting to download wrong WordPress version will throw an exception", function ($versions) {
-	prepareFileStubs();
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
@@ -184,13 +171,13 @@ it("checks that attempting to download wrong WordPress version will throw an exc
 		->assertOutputContains('Wrong WordPress version. Make sure the version number is correct.');
 })->with([
 	'5.9.15',
+	'5.9',
 	'4.2.',
 	'latestt',
 	'sdlfkj97 0236 ./',
 ]);
 
 it("checks that attempting to download WordPress version will work", function ($versions) {
-	prepareFileStubs();
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
@@ -200,17 +187,16 @@ it("checks that attempting to download WordPress version will work", function ($
 })->with([
 	null,
 	'',
-	'5.4'
+	'4.7.3',
+	'6.0.0'
 ]);
 
 it('checks that the database dropin is copied over correctly', function () {
 	$ds = DIRECTORY_SEPARATOR;
-	prepareFileStubs();
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
 		->execute()
-		->dump()
 		->assertSuccessful();
 
 	// Check if the files were created, as intended.
@@ -229,4 +215,12 @@ it('checks that the database dropin is copied over correctly', function () {
 	expect($testContents)->toContain('This is a test!');
 
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content' . $ds . 'db.php')->toBeReadableFile();
+});
+
+it('checks that skipping delete will work', function () {
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->addOption('skip-delete')
+		->execute()
+		->assertSuccessful();
 });

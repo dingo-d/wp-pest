@@ -50,6 +50,7 @@ Arguments:
 Options:
       --wp-version[=WP-VERSION]    Pass the version of the WordPress you want to test on. [default: "latest"]
       --plugin-slug[=PLUGIN-SLUG]  If you are setting the plugin tests provide the plugin slug.
+      --skip-delete                If you are running the setup tests in a CI pipeline, provide this option to skip the deletion step.
   -h, --help                       Display help for the given command. When no command is given display help for the list command
   -q, --quiet                      Do not output any message
   -V, --version                    Display this application version
@@ -110,6 +111,10 @@ Not running external-http tests. To execute these, use --group external-http.
 ```
 
 The test suites are grouped together, and it's necessary to pass the `--group=integration` option if you want to run integration tests, because that way the bootstrap knows to load integration test specific configuration when running tests.
+
+## Running the package in CI pipelines
+
+If you want to run the package as a part of your continuous integration (CI) pipeline, be sure to provide the `--skip-delete` parameter when running the `wp-pest setup` command. This will skip the deletion of the `wp-content` folder (which is not important at all, especially in CI environments), and won't block the setup script.
 
 ## Questions
 

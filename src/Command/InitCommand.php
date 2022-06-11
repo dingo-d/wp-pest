@@ -68,6 +68,15 @@ class InitCommand extends Command
 	private const PLUGIN_SLUG = 'plugin-slug';
 
 	/**
+	 * Skip wp-content folder delete option string
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var string
+	 */
+	private const SKIP_DELETE = 'skip-delete';
+
+	/**
 	 * WordPress GitHub tag zip url
 	 *
 	 * At the end there needs to go the version followed by .zip in order to fetch the contents.
@@ -81,11 +90,12 @@ class InitCommand extends Command
 	/**
 	 * WordPress version tags
 	 *
+	 * @since 1.3.0 Change the URL of the API tags to GH one.
 	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
-	public const WP_API_TAGS = 'https://api.wordpress.org/core/stable-check/1.0/';
+	public const WP_API_TAGS = 'https://api.github.com/repos/WordPress/wordpress-develop/git/matching-refs/tags';
 
 	/**
 	 * Root path of the project
@@ -143,6 +153,7 @@ class InitCommand extends Command
 	/**
 	 * Configures the current command
 	 *
+	 * @since 1.4.0 Add option to skip deletion of the wp-content folder.
 	 * @since 1.0.0
 	 *
 	 * @return void
@@ -169,6 +180,12 @@ class InitCommand extends Command
 				null,
 				InputOption::VALUE_OPTIONAL,
 				'If you are setting the plugin tests provide the plugin slug.'
+			)
+			->addOption(
+				self::SKIP_DELETE,
+				null,
+				InputOption::VALUE_NONE,
+				'If you are running the setup tests in a CI pipeline, provide this option to skip the deletion step.'
 			);
 	}
 
@@ -253,7 +270,7 @@ class InitCommand extends Command
 
 			try {
 				$this->downloadWPCoreAndTests('latest');
-			} catch (Exception $e) {
+			} catch (Exception | GuzzleException $e) {
 				$io->error($e->getMessage());
 
 				return Command::FAILURE;
@@ -265,12 +282,13 @@ class InitCommand extends Command
 			try {
 				// @phpstan-ignore-next-line
 				$this->downloadWPCoreAndTests($wpVersion);
-			} catch (Exception $e) {
+			} catch (Exception | GuzzleException $e) {
 				$io->error($e->getMessage());
 
 				return Command::FAILURE;
 			}
 		}
+
 		$io->success('WordPress downloaded successfully.');
 
 		// Extract will extract the file to a folder like wp/wordpress-develop-X.Y.Z
@@ -298,6 +316,14 @@ class InitCommand extends Command
 		$this->filesystem->copy($packageDropIn, $coreDropIn);
 
 		$io->success('Database drop-in copied successfully.');
+
+		$skipDelete = $input->getOption(self::SKIP_DELETE);
+
+		if ($skipDelete) {
+			$io->success("All done! Go and write tests 😄");
+
+			return Command::SUCCESS;
+		}
 
 		$cleanDbPackage = $io->confirm('Do you want to clean the DB package folder?', false);
 
@@ -358,17 +384,22 @@ class InitCommand extends Command
 	 *
 	 * @param string $version Version to download.
 	 *
-	 * @since 1.0.0
-	 *
 	 * @return void
+	 *
 	 * @throws InvalidArgumentException Throws an exception if the version number is not correct.
 	 * @throws RuntimeException Throws an exception if the file download fails.
+	 * @throws GuzzleException Throws an exception if the file download fails.
+	 *
+	 * @since 1.3.0 Change the way GH tags are fetched.
+	 * @since 1.0.0
+	 *
 	 */
 	private function downloadWPCoreAndTests(string $version): void
 	{
+		$versions = $this->getGitHubTags();
+
 		if ($version === 'latest') {
-			$wpVersions = (array) json_decode((string) file_get_contents(self::WP_API_TAGS), true);
-			$version = array_key_last($wpVersions);
+			$version = end($versions);
 		} else {
 			/**
 			 * Only validate if the parameter was passed.
@@ -417,24 +448,18 @@ class InitCommand extends Command
 	 *
 	 * @param string $version Version number.
 	 *
+	 * @since 1.3.0 Changed the logic of checking the existing tags.
 	 * @since 1.0.0
 	 *
 	 * @return bool True if the response returns correct value. False otherwise.
 	 */
 	private function isWPVersionValid(string $version): bool
 	{
-		// Memoization.
-		static $versions;
-
-		if (empty($versions)) {
-			$versions = json_decode((string) file_get_contents(self::WP_API_TAGS), true);
-		}
-
-		if (!isset($versions[$version])) {
+		try {
+			return in_array($version, $this->getGitHubTags());
+		} catch (GuzzleException $e) {
 			return false;
 		}
-
-		return true;
 	}
 
 	/**
@@ -497,5 +522,49 @@ class InitCommand extends Command
 
 		// Delete the folder we don't need anymore.
 		$this->filesystem->remove($folderToCheck);
+	}
+
+	/**
+	 * Get all the tags from the GitHub
+	 *
+	 * @return string[] List of all the available GitHub tagged versions.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @throws GuzzleException Exception in case of Guzzle error.
+	 */
+	private function getGitHubTags(): array
+	{
+		static $versions;
+
+		if (empty($versions)) {
+			$response = $this->client->request(
+				'GET',
+				self::WP_API_TAGS,
+				[
+					'Accept' => 'application/vnd.github.v3+json'
+				]
+			);
+
+			if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+				return [];
+			}
+
+			$contents = $response->getBody()->getContents();
+
+			$refArray = (array) json_decode($contents, true);
+
+			$versions = array_map(static function ($refInfo) {
+				if (!is_array($refInfo)) {
+					return '';
+				}
+
+				$reference = $refInfo['ref'] ?? '';
+				preg_match_all('/[\d.]*$/', $reference, $matchNumber, PREG_SET_ORDER);
+				return $matchNumber[0][0] ?? '';
+			}, $refArray);
+		}
+
+		return $versions;
 	}
 }
