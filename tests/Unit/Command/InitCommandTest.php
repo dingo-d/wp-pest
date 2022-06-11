@@ -216,3 +216,11 @@ it('checks that the database dropin is copied over correctly', function () {
 
 	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content' . $ds . 'db.php')->toBeReadableFile();
 });
+
+it('checks that skipping delete will work', function () {
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->addOption('skip-delete')
+		->execute()
+		->assertSuccessful();
+});
