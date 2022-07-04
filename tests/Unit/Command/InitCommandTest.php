@@ -71,8 +71,27 @@ it("checks that the command throws error if the wp directory already exists", fu
 		->assertStatusCode(1);
 });
 
-it("checks that the command throws error if the plugin slug isn't valid", function ($slugs) {
+it("checks that the command throws error if the plugin slug isn't a string", function ($slugs) {
+	TestCommand::for($this->command)
+		->addArgument('plugin')
+		->addOption('plugin-slug', $slugs)
+		->execute()
+		->assertStatusCode(1)
+		->assertOutputContains("Plugin slug must be a string.");
+})->with([
+	false, // null.
+	true, // "1".
+	new \stdClass(), // "1".
+	[], // null.
+	[1, 2, 3, 'dog'], // "1".
+	null, // "1".
+	// fn($a) => 3 + $a, // null. Errors out on the test. Cannot pass this as an argument on the CLI anyhow (I think).
+])->skip(
+	true,
+	'getOption will cast these, and some will pass the test, some not. In any case most of these cannot be passed as options on the CLI'
+);
 
+it("checks that the command throws error if the plugin slug isn't valid", function ($slugs) {
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->addOption('plugin-slug', $slugs)
@@ -80,29 +99,78 @@ it("checks that the command throws error if the plugin slug isn't valid", functi
 		->assertStatusCode(1)
 		->assertOutputContains("Plugin slug must be written in lowercase, separated by a dash.");
 })->with([
-	"1Not",
+	"1Notvalid", // Capital letters not allowed, numbers are ok.
 	"noT_allowed",
-	"asllaso-asdasdasd_aasdasdasd",
-	"1243-234234234",
 	"NO-YELLING",
-	"asdlkj^asdasd",
-	"olko_asdasdad",
+	"asdlkj^asdasd", // Character not allowed.
 	"IKjasopdk-asdasd",
 	"./.asd.asd-asd/asd.,123445",
 	"this-is-ok.zip",
+	"🤞🏼123-tes", // Emoji.
+	"👍🏼"
+]);
+
+
+it("checks that the command throws error if the plugin slug is too short", function ($slugs) {
+	TestCommand::for($this->command)
+		->addArgument('plugin')
+		->addOption('plugin-slug', $slugs)
+		->execute()
+		->assertStatusCode(1)
+		->assertOutputContains("Plugin slug must be at least 5 characters long.");
+})->with([
+	"1",
+	"ab",
+	"👍",
+	"te-s",
+	"1e_s",
 ]);
 
 it("checks that the command works ok if the plugin slug is valid", function ($slugs) {
-
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->addOption('plugin-slug', $slugs)
 		->execute()
 		->assertSuccessful();
 })->with([
-	'ok-name',
-	'ok-even-if-multiple-dashes',
-	'thisisok',
+	"ok-name",
+	"ok-even-if-multiple-dashes",
+	"thisisok",
+	"qps-s3",
+	"12-best-cats-plugin",
+	"plugin-90-with-number-in-slug", // Below this are legit plugin slugs found in the wp.org repo.
+	"я-делюсь",
+	"لينوكس-ويكى",
+	"search-excel-csv",
+	"cdn-manager",
+	"jmbtrn",
+	"★-wpsymbols-★",
+	"分享图片到新浪微博",
+	"印象码",
+	"友言",
+	"唐诗宋词chinese-poem",
+	"图片签名插件",
+	"多说社会化评论框",
+	"开心网开放平台插件",
+	"微集分插件",
+	"新浪微博",
+	"无觅相关文章插件",
+	"日志保护",
+	"海阔淘宝相关宝贝插件",
+	"社交登录",
+	"腾讯微博一键登录",
+	"豆瓣秀-for-wordpress",
+	"0-delay-late-caching-for-feeds",
+	"0-errors",
+	"001-prime-strategy-translate-accelerator",
+	"002-ps-custom-post-type",
+	"011-ps-custom-taxonomy",
+	"012-ps-multi-languages",
+	"dump_env",
+	"dump_queries",
+	"dunamys-ribbon",
+	"dunstan-error-page",
+	"duo-fqa",
 ]);
 
 it("checks that the command creates folder with correct templates for a plugin", function () {
