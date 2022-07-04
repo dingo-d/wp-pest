@@ -215,13 +215,29 @@ class InitCommand extends Command
 		}
 
 		if ($projectType === 'plugin') {
+			if (!is_string($pluginSlug)) {
+				$io->error('Plugin slug must be a string.');
+
+				return Command::FAILURE;
+			}
+
 			if (empty($pluginSlug)) {
 				$io->error('You need to provide the plugin slug if you want to set up plugin integration test suite.');
 
 				return Command::FAILURE;
 			}
 
-			// @phpstan-ignore-next-line
+			/**
+			 * Check if the plugin slug is less than 5 characters long.
+			 *
+			 * @link https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/plugin-directory/shortcodes/class-upload-handler.php#L173
+			 */
+			if (strlen($pluginSlug) < 5) {
+				$io->error('Plugin slug must be at least 5 characters long.');
+
+				return Command::FAILURE;
+			}
+
 			if (!$this->checkIfPluginSlugIsValid($pluginSlug)) {
 				$io->error('Plugin slug must be written in lowercase, separated by a dash.');
 
@@ -475,7 +491,7 @@ class InitCommand extends Command
 	 */
 	private function checkIfPluginSlugIsValid(string $pluginSlug): bool
 	{
-		preg_match_all('/^[a-z\-]+$/m', $pluginSlug, $matches, PREG_SET_ORDER);
+		preg_match_all('/^[a-z\-\d_\p{Cyrillic}\p{Arabic}★\p{Han}]+$/mu', $pluginSlug, $matches, PREG_SET_ORDER);
 
 		return !empty($matches);
 	}
