@@ -33,9 +33,16 @@ final class CustomMockHandler
 		$ds = DIRECTORY_SEPARATOR;
 		$path = $request->getUri()->getPath();
 
-		$zipContents = (string)file_get_contents(
-			dirname(__DIR__) . $ds . 'stubs' . $ds . 'wordpress-develop-6.0.0.zip'
-		);
+		if (strpos($path, 'wordpress-develop/archive') !== false) {
+			$zipContents = (string)file_get_contents(
+				dirname(__DIR__) . $ds . 'stubs' . $ds . 'wordpress-develop-6.1.1.zip'
+			);
+		} else {
+			$zipContents = (string)file_get_contents(
+				dirname(__DIR__) . $ds . 'stubs' . $ds . 'WordPress-6.1.1.zip'
+			);
+		}
+
 		$versions = (string)file_get_contents(dirname(__DIR__) . $ds . 'stubs' . $ds . 'git-refs.json');
 
 		// For the path that contains the .zip with version number we need to strip that one out.

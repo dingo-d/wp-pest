@@ -13,12 +13,9 @@ declare(strict_types=1);
 namespace MadeByDenis\WpPestIntegrationTestSetup\Command;
 
 use Exception;
-use FilesystemIterator;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,7 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use UnexpectedValueException;
 use ZipArchive;
 
 /**
@@ -77,6 +73,15 @@ class InitCommand extends Command
 	private const SKIP_DELETE = 'skip-delete';
 
 	/**
+	 * Force reinstall of the WordPress directory
+	 *
+	 * @since 1.5.0
+	 *
+	 * @var string
+	 */
+	private const FORCE = 'force';
+
+	/**
 	 * WordPress GitHub tag zip url
 	 *
 	 * At the end there needs to go the version followed by .zip in order to fetch the contents.
@@ -86,6 +91,17 @@ class InitCommand extends Command
 	 * @var string
 	 */
 	public const WP_GH_TAG_URL = 'https://github.com/WordPress/wordpress-develop/archive/refs/tags/';
+
+	/**
+	 * WordPress release zip url
+	 *
+	 * At the end there needs to go the version followed by .zip in order to fetch the contents.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @var string
+	 */
+	public const WP_GH_RELEASE_TAG_URL = 'https://github.com/WordPress/WordPress/archive/refs/tags/';
 
 	/**
 	 * WordPress version tags
@@ -186,6 +202,12 @@ class InitCommand extends Command
 				null,
 				InputOption::VALUE_NONE,
 				'If you are running the setup tests in a CI pipeline, provide this option to skip the deletion step.'
+			)
+			->addOption(
+				self::FORCE,
+				null,
+				InputOption::VALUE_NONE,
+				'Force download of WordPress core files. This will overwrite everything in the wp folder.'
 			);
 	}
 
@@ -221,12 +243,6 @@ class InitCommand extends Command
 				return Command::FAILURE;
 			}
 
-			if (empty($pluginSlug)) {
-				$io->error('You need to provide the plugin slug if you want to set up plugin integration test suite.');
-
-				return Command::FAILURE;
-			}
-
 			/**
 			 * Check if the plugin slug is less than 5 characters long.
 			 *
@@ -246,6 +262,7 @@ class InitCommand extends Command
 		}
 
 		$wpVersion = $input->getOption(self::WP_VERSION);
+		$forceReinstall = $input->getOption(self::FORCE);
 
 		$io->text('Attempting to create tests folder');
 
@@ -271,7 +288,7 @@ class InitCommand extends Command
 			return Command::FAILURE;
 		}
 
-		if ($this->filesystem->exists($wpDir)) {
+		if ($this->filesystem->exists($wpDir) && !$forceReinstall) {
 			$io->info('WordPress core and test files already downloaded. No need to run this command again.');
 
 			return Command::FAILURE;
@@ -285,7 +302,7 @@ class InitCommand extends Command
 			$io->text('Downloading the latest WordPress version. This may take a while, grab a coffee or tea 🍵...');
 
 			try {
-				$this->downloadWPCoreAndTests('latest');
+				$this->downloadWPCoreAndTests('latest', $wpDir);
 			} catch (Exception | GuzzleException $e) {
 				$io->error($e->getMessage());
 
@@ -293,11 +310,11 @@ class InitCommand extends Command
 			}
 		} else {
 			// @phpstan-ignore-next-line
-			$io->text("Downloading WordPress version $wpVersion. This may take a while, grab a coffee️ or tea 🍵...");
+			$io->text("Downloading WordPress version $wpVersion. This may take a while, grab a coffee or tea 🍵...");
 
 			try {
 				// @phpstan-ignore-next-line
-				$this->downloadWPCoreAndTests($wpVersion);
+				$this->downloadWPCoreAndTests($wpVersion, $wpDir);
 			} catch (Exception | GuzzleException $e) {
 				$io->error($e->getMessage());
 
@@ -317,7 +334,7 @@ class InitCommand extends Command
 		 * will be copied in the project root (kinda annoying). So we need to manually clean that folder later.
 		 */
 		$packageDropIn = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
-		$coreDropInPath = $this->rootPath . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content';
+		$coreDropInPath = $wpDir . $ds . 'src' . $ds . 'wp-content';
 		$coreDropIn = $coreDropInPath . $ds . 'db.php';
 
 		// This is a dirty hack so that the test pass.
@@ -406,12 +423,17 @@ class InitCommand extends Command
 	 * @throws RuntimeException Throws an exception if the file download fails.
 	 * @throws GuzzleException Throws an exception if the file download fails.
 	 *
+	 * @since 1.5.0 Add wp directory path parameter and delete the directory.
 	 * @since 1.3.0 Change the way GH tags are fetched.
 	 * @since 1.0.0
 	 *
 	 */
-	private function downloadWPCoreAndTests(string $version): void
+	private function downloadWPCoreAndTests(string $version, string $wpdir): void
 	{
+		if ($this->filesystem->exists($wpdir)) {
+			$this->filesystem->remove($wpdir);
+		}
+
 		$versions = $this->getGitHubTags();
 
 		if ($version === 'latest') {
@@ -428,6 +450,10 @@ class InitCommand extends Command
 			}
 		}
 
+		if (empty($version)) {
+			throw new InvalidArgumentException('WordPress version is empty.');
+		}
+
 		// Download a zip file, unzip it to root/wp folder and delete the .zip file.
 		$zipName = $this->rootPath . DIRECTORY_SEPARATOR . "wordpress-develop-$version.zip";
 
@@ -441,7 +467,7 @@ class InitCommand extends Command
 		$zip = new ZipArchive();
 
 		if ($zip->open($zipName)) {
-			$extractSuccessful = $zip->extractTo($this->rootPath . DIRECTORY_SEPARATOR . 'wp');
+			$extractSuccessful = $zip->extractTo($wpdir);
 
 			if (!$extractSuccessful) {
 				throw new RuntimeException('Failed extracting zip file');
@@ -450,13 +476,51 @@ class InitCommand extends Command
 			$zip->close();
 		}
 
-		unlink($zipName);
+		$this->filesystem->remove($zipName);
+
+		/*
+		 * Because WordPress is being WordPress, the GitHub repo of the wordpress-develop
+		 * branch doesn't contain all the core files you'd get when you download WordPress,
+		 * so we need to download the release version as well, and rewrite the `wp/src` core files.
+		 *
+		 * Also, the major versions are tagged differently, so 1.5.0 on develop is 1.5 on core.
+		 */
+		$coreVersion = preg_replace('/^(\d\.\d)\.0/i', '$1', $version);
+
+		// Download a zip file, unzip it to root/wp/src folder and delete the .zip file.
+		$zipName = $this->rootPath . DIRECTORY_SEPARATOR . "WordPress-$coreVersion.zip";
+
+		try {
+			$this->client->request('GET', self::WP_GH_RELEASE_TAG_URL . $coreVersion . '.zip', ['sink' => $zipName]);
+		} catch (GuzzleException $e) {
+			throw new RuntimeException('Failed opening remote file');
+		}
+
+		if ($zip->open($zipName)) {
+			$extractSuccessful = $zip->extractTo($wpdir);
+
+			if (!$extractSuccessful) {
+				throw new RuntimeException('Failed extracting zip file');
+			}
+
+			$zip->close();
+		}
+
+		$this->filesystem->remove($zipName);
 
 		// Loop through all the folder contents, and copy them to the wp/ folder.
-		$folderToCopyTo = $this->rootPath . DIRECTORY_SEPARATOR . 'wp';
-		$folderToCheck = $folderToCopyTo . DIRECTORY_SEPARATOR . "wordpress-develop-$version";
+		$destinationFolder = $wpdir;
+		$folderToCopy = $wpdir . DIRECTORY_SEPARATOR . "wordpress-develop-$version";
 
-		$this->moveFilesUpOneFolder($folderToCheck, $folderToCopyTo);
+		$this->filesystem->mirror($folderToCopy, $wpdir, null, ['override' => true]);
+		$this->filesystem->remove($folderToCopy);
+
+		// Loop through all the folder contents, and copy them to the wp/src folder.
+		$wpCoreFolderToCopy = $destinationFolder . DIRECTORY_SEPARATOR . "WordPress-$coreVersion";
+		$coderDestinationFolder = $wpdir . DIRECTORY_SEPARATOR . 'src';
+
+		$this->filesystem->mirror($wpCoreFolderToCopy, $coderDestinationFolder, null, ['override' => true]);
+		$this->filesystem->remove($wpCoreFolderToCopy);
 	}
 
 	/**
@@ -497,50 +561,6 @@ class InitCommand extends Command
 	}
 
 	/**
-	 * Move all files from the zip file up one folder
-	 *
-	 * @param string $folderToCheck Folder containing files and folders.
-	 * @param string $folderToCopyTo Folder where files and folders should be copied to.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
-	 */
-	private function moveFilesUpOneFolder(string $folderToCheck, string $folderToCopyTo): void
-	{
-		if (!is_dir($folderToCheck)) {
-			return;
-		}
-
-		try {
-			$iterator = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($folderToCheck, FilesystemIterator::SKIP_DOTS),
-				RecursiveIteratorIterator::SELF_FIRST
-			);
-		} catch (UnexpectedValueException $exception) {
-			throw new RuntimeException('Error while instantiating recursive iterator.');
-		}
-
-		$ds = DIRECTORY_SEPARATOR;
-
-		foreach ($iterator as $item) {
-			$subPathName = $iterator->getSubPathname();
-			$destinationPath = rtrim($folderToCopyTo, $ds) . $ds . $subPathName;
-
-			if ($item->isDir()) { // @phpstan-ignore-line
-				if (!file_exists($destinationPath)) {
-					mkdir($destinationPath, 0755, true);
-				}
-			} else {
-				copy($item->getPathname(), $destinationPath); // @phpstan-ignore-line
-			}
-		}
-
-		// Delete the folder we don't need anymore.
-		$this->filesystem->remove($folderToCheck);
-	}
-
-	/**
 	 * Get all the tags from the GitHub
 	 *
 	 * @return string[] List of all the available GitHub tagged versions.
@@ -561,7 +581,6 @@ class InitCommand extends Command
 					'Accept' => 'application/vnd.github.v3+json'
 				]
 			);
-
 			if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
 				return [];
 			}

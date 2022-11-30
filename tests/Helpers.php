@@ -16,6 +16,7 @@ use Mockery\MockInterface;
 use Mockery\LegacyMockInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Mockery shorthand
@@ -43,23 +44,14 @@ function mock(string $class)
 function deleteOutputDir(string $dir = ''): void
 {
 	if (!$dir) {
-		$dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'output';
+		$dir = __DIR__ . DIRECTORY_SEPARATOR . 'output';
 	}
 
 	if (!\is_dir($dir)) {
 		return;
 	}
 
-	$iterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
-	$files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST);
+	$fs = new Filesystem();
 
-	foreach ($files as $file) {
-		if ($file->isDir()) {
-			rmdir($file->getRealPath());
-		} else {
-			unlink($file->getRealPath());
-		}
-	}
-
-	rmdir($dir);
+	$fs->remove($dir);
 }
