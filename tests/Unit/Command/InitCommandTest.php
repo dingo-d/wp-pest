@@ -10,7 +10,7 @@ use MadeByDenis\WpPestIntegrationTestSetup\Tests\Mocks\CustomMockHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Console\Test\TestCommand;
 
-use function MadeByDenis\WpPestIntegrationTestSetup\Tests\deleteOutputDir;
+use function MadeByDenis\WpPestIntegrationTestSetup\Tests\{deleteOutputDir, mock};
 
 beforeEach(function () {
 	Monkey\setUp();
@@ -42,7 +42,7 @@ it("checks that the command doesn't have default description", function () {
 	expect($this->command::getDefaultDescription())->toBeNull();
 });
 
-it("checks that the command throws error when argument isn't specified", function () {
+it("checks that the command throws error when arguments aren't specified", function () {
 	TestCommand::for($this->command)
 		->execute();
 })->expectException('RuntimeException');
@@ -92,6 +92,7 @@ it("checks that the command throws error if the plugin slug isn't a string", fun
 );
 
 it("checks that the command throws error if the plugin slug isn't valid", function ($slugs) {
+
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->addOption('plugin-slug', $slugs)
@@ -130,6 +131,7 @@ it("checks that the command works ok if the plugin slug is valid", function ($sl
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->addOption('plugin-slug', $slugs)
+		->addOption('force')
 		->execute()
 		->assertSuccessful();
 })->with([
@@ -230,7 +232,6 @@ it("checks that the command creates folder with correct templates for a theme", 
 });
 
 it("checks that attempting to download wrong WordPress version will throw an exception", function ($versions) {
-
 	TestCommand::for($this->command)
 		->addArgument('theme')
 		->addOption('--wp-version', $versions)
@@ -246,7 +247,6 @@ it("checks that attempting to download wrong WordPress version will throw an exc
 ]);
 
 it("checks that attempting to download WordPress version will work", function ($versions) {
-
 	TestCommand::for($this->command)
 		->addArgument('theme')
 		->addOption('--wp-version', $versions)
@@ -255,8 +255,7 @@ it("checks that attempting to download WordPress version will work", function ($
 })->with([
 	null,
 	'',
-	'4.7.3',
-	'6.0.0'
+	'6.1.1'
 ]);
 
 it('checks that the database dropin is copied over correctly', function () {
@@ -292,3 +291,66 @@ it('checks that skipping delete will work', function () {
 		->execute()
 		->assertSuccessful();
 });
+
+it('checks that the WordPress Core is copied over correctly', function () {
+	$ds = DIRECTORY_SEPARATOR;
+
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->execute()
+		->assertSuccessful();
+
+	// Check if the files were created, as intended.
+	expect($this->outputDir . $ds . 'wp')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-admin')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-content')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-includes')->toBeDirectory();
+	expect($this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-includes' . $ds . 'assets')->toBeDirectory();
+
+	$file = $this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'wp-includes' . $ds . 'assets' . $ds . 'hello.txt';
+	expect($file)->toBeReadableFile();
+	$helloContents = file_get_contents($file);
+	expect($helloContents)->toContain('This is a test.');
+
+	$indexFile = $this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'index.php';
+	expect($indexFile)->toBeReadableFile();
+	$indexContents = file_get_contents($indexFile);
+	expect($indexContents)->toContain('// Silence is golden.');
+});
+
+it('deletes the drop-in folder if the cleanup is confirmed', function () {
+	/*
+	 * We need to create an instance mock of SymfonyStyle
+	 * so that we can mock `confirm` method to always return true.
+	 * That way we can test the db cleanup.
+	 */
+	$mock = mock('overload:Symfony\Component\Console\Style\SymfonyStyle');
+	$mock->shouldReceive('confirm')
+		->once()
+		->andReturnTrue();
+
+	$mock->shouldReceive('text')
+		->andReturnArg(0);
+
+	$mock->shouldReceive('success')
+		->andReturnArg(0);
+
+	$mock->shouldReceive('info')
+		->andReturnArg(0);
+
+	$ds = DIRECTORY_SEPARATOR;
+
+	// Add the wp-content folder in the output of the tests.
+	mkdir($this->outputDir . $ds . 'wp-content');
+
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->execute()
+		->assertSuccessful();
+
+	expect($this->outputDir . $ds . 'wp-content')->not->toBeDirectory();
+})->skip(
+	true,
+	'This test will only work if we run it on its own or in process isolation (not available in Pest v1)
+	due to method overloading of SymfonyStyle confirm.'
+);

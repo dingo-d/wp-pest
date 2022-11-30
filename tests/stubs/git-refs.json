@@ -1140,6 +1140,26 @@
     }
   },
   {
+    "ref": "refs/tags/3.7.39",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuNy4zOQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.7.39",
+    "object": {
+      "sha": "6d702fa611a5aae4bf8013f9670d193ba5ec769d",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/6d702fa611a5aae4bf8013f9670d193ba5ec769d"
+    }
+  },
+  {
+    "ref": "refs/tags/3.7.40",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuNy40MA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.7.40",
+    "object": {
+      "sha": "756915de8c5dbe6c9b210299ec8ce8d524f9dfaf",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/756915de8c5dbe6c9b210299ec8ce8d524f9dfaf"
+    }
+  },
+  {
     "ref": "refs/tags/3.8.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuOC4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.8.0",
@@ -1530,6 +1550,26 @@
     }
   },
   {
+    "ref": "refs/tags/3.8.39",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuOC4zOQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.8.39",
+    "object": {
+      "sha": "fffdf0939e6d3f351a14ebced5604c25c8543c41",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/fffdf0939e6d3f351a14ebced5604c25c8543c41"
+    }
+  },
+  {
+    "ref": "refs/tags/3.8.40",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuOC40MA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.8.40",
+    "object": {
+      "sha": "984f17b49eda7f6376879e4fa3efa8689763effe",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/984f17b49eda7f6376879e4fa3efa8689763effe"
+    }
+  },
+  {
     "ref": "refs/tags/3.9.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuOS4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.9.0",
@@ -1900,6 +1940,36 @@
     }
   },
   {
+    "ref": "refs/tags/3.9.37",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuOS4zNw==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.9.37",
+    "object": {
+      "sha": "65a889820f72b0ccaf956498dd29845251cd1dbe",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/65a889820f72b0ccaf956498dd29845251cd1dbe"
+    }
+  },
+  {
+    "ref": "refs/tags/3.9.38",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuOS4zOA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.9.38",
+    "object": {
+      "sha": "f1315c20d8bcedf874f0ad7a33ccdeeff22db823",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/f1315c20d8bcedf874f0ad7a33ccdeeff22db823"
+    }
+  },
+  {
+    "ref": "refs/tags/3.9.39",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzMuOS4zOQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/3.9.39",
+    "object": {
+      "sha": "62cac0fe906a1abd00de540e0155bebbd213b510",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/62cac0fe906a1abd00de540e0155bebbd213b510"
+    }
+  },
+  {
     "ref": "refs/tags/4.0.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMC4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.0.0",
@@ -2257,6 +2327,26 @@
       "sha": "b190e4e82ea9f9274ecd0414b598b449017514df",
       "type": "commit",
       "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/b190e4e82ea9f9274ecd0414b598b449017514df"
+    }
+  },
+  {
+    "ref": "refs/tags/4.0.36",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMC4zNg==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.0.36",
+    "object": {
+      "sha": "db98837af446f0705a6298670aa2f7fb680dcfb8",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/db98837af446f0705a6298670aa2f7fb680dcfb8"
+    }
+  },
+  {
+    "ref": "refs/tags/4.0.37",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMC4zNw==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.0.37",
+    "object": {
+      "sha": "1628d676373350de9ad0fb180697d86646916847",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/1628d676373350de9ad0fb180697d86646916847"
     }
   },
   {
@@ -2620,6 +2710,26 @@
     }
   },
   {
+    "ref": "refs/tags/4.1.36",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMS4zNg==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.1.36",
+    "object": {
+      "sha": "86cd34d4cd58ee883c97bdd59185b82a8e0c8b97",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/86cd34d4cd58ee883c97bdd59185b82a8e0c8b97"
+    }
+  },
+  {
+    "ref": "refs/tags/4.1.37",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMS4zNw==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.1.37",
+    "object": {
+      "sha": "07c94f5f74309fce5b04b6ff099395390782d193",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/07c94f5f74309fce5b04b6ff099395390782d193"
+    }
+  },
+  {
     "ref": "refs/tags/4.2.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMi4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.2.0",
@@ -2950,6 +3060,26 @@
     }
   },
   {
+    "ref": "refs/tags/4.2.33",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMi4zMw==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.2.33",
+    "object": {
+      "sha": "04f4a2fc3b0c0060b7b66aa41d32dc9010035eb5",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/04f4a2fc3b0c0060b7b66aa41d32dc9010035eb5"
+    }
+  },
+  {
+    "ref": "refs/tags/4.2.34",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMi4zNA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.2.34",
+    "object": {
+      "sha": "12229fb05d511d1bffb02d5598d857b949b5ea14",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/12229fb05d511d1bffb02d5598d857b949b5ea14"
+    }
+  },
+  {
     "ref": "refs/tags/4.3.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMy4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.3.0",
@@ -3240,6 +3370,26 @@
     }
   },
   {
+    "ref": "refs/tags/4.3.29",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMy4yOQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.3.29",
+    "object": {
+      "sha": "02a271aed7a36e3c47372c0d7eec2492e431b095",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/02a271aed7a36e3c47372c0d7eec2492e431b095"
+    }
+  },
+  {
+    "ref": "refs/tags/4.3.30",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuMy4zMA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.3.30",
+    "object": {
+      "sha": "bee6c87e5d2f381c653ad99ba7d3944d18d7e922",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/bee6c87e5d2f381c653ad99ba7d3944d18d7e922"
+    }
+  },
+  {
     "ref": "refs/tags/4.4.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNC4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.4.0",
@@ -3520,6 +3670,26 @@
     }
   },
   {
+    "ref": "refs/tags/4.4.28",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNC4yOA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.4.28",
+    "object": {
+      "sha": "4aa5beb8296d325b61f86d0e70125da04d137536",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/4aa5beb8296d325b61f86d0e70125da04d137536"
+    }
+  },
+  {
+    "ref": "refs/tags/4.4.29",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNC4yOQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.4.29",
+    "object": {
+      "sha": "332dd08ee23c9be3aae3423ee5bb8f23c17b66fb",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/332dd08ee23c9be3aae3423ee5bb8f23c17b66fb"
+    }
+  },
+  {
     "ref": "refs/tags/4.5.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNS4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.5.0",
@@ -3790,6 +3960,26 @@
     }
   },
   {
+    "ref": "refs/tags/4.5.27",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNS4yNw==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.5.27",
+    "object": {
+      "sha": "997f13b23b8ce582e5734c4d68f7e3a9d131a534",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/997f13b23b8ce582e5734c4d68f7e3a9d131a534"
+    }
+  },
+  {
+    "ref": "refs/tags/4.5.28",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNS4yOA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.5.28",
+    "object": {
+      "sha": "a44891d91d63aabf76ee3c1debc28108daccc692",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/a44891d91d63aabf76ee3c1debc28108daccc692"
+    }
+  },
+  {
     "ref": "refs/tags/4.6.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNi4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.6.0",
@@ -4027,6 +4217,26 @@
       "sha": "180661db4cfdb9dee44cd2c293c04289880694d2",
       "type": "commit",
       "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/180661db4cfdb9dee44cd2c293c04289880694d2"
+    }
+  },
+  {
+    "ref": "refs/tags/4.6.24",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNi4yNA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.6.24",
+    "object": {
+      "sha": "e6eed0db6c9328eb5b1e7cf0d147d5f104a7d537",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/e6eed0db6c9328eb5b1e7cf0d147d5f104a7d537"
+    }
+  },
+  {
+    "ref": "refs/tags/4.6.25",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNi4yNQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.6.25",
+    "object": {
+      "sha": "f32dd40a9afeb2057c524212b2cacb3580ce0616",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/f32dd40a9afeb2057c524212b2cacb3580ce0616"
     }
   },
   {
@@ -4270,6 +4480,26 @@
     }
   },
   {
+    "ref": "refs/tags/4.7.24",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNy4yNA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.7.24",
+    "object": {
+      "sha": "958909c7fb80155e19b0800143ceb8bff722fa13",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/958909c7fb80155e19b0800143ceb8bff722fa13"
+    }
+  },
+  {
+    "ref": "refs/tags/4.7.25",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuNy4yNQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.7.25",
+    "object": {
+      "sha": "a9913067c2e9ba7cf7d1560d9a39656f854fadf4",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/a9913067c2e9ba7cf7d1560d9a39656f854fadf4"
+    }
+  },
+  {
     "ref": "refs/tags/4.8.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuOC4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.8.0",
@@ -4467,6 +4697,26 @@
       "sha": "9dff06439f0c73c56a23a2478310cde2ea7fc823",
       "type": "commit",
       "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/9dff06439f0c73c56a23a2478310cde2ea7fc823"
+    }
+  },
+  {
+    "ref": "refs/tags/4.8.20",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuOC4yMA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.8.20",
+    "object": {
+      "sha": "6b8765633da22a06eacdc221c3cd61c4aac2ba6a",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/6b8765633da22a06eacdc221c3cd61c4aac2ba6a"
+    }
+  },
+  {
+    "ref": "refs/tags/4.8.21",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuOC4yMQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.8.21",
+    "object": {
+      "sha": "0811abd00138bd95ce0c4ed5eb69ecab484e1e2b",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/0811abd00138bd95ce0c4ed5eb69ecab484e1e2b"
     }
   },
   {
@@ -4680,6 +4930,26 @@
     }
   },
   {
+    "ref": "refs/tags/4.9.21",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuOS4yMQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.9.21",
+    "object": {
+      "sha": "f03b54749896761298cf89c82d1e7bafa747b264",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/f03b54749896761298cf89c82d1e7bafa747b264"
+    }
+  },
+  {
+    "ref": "refs/tags/4.9.22",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzQuOS4yMg==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/4.9.22",
+    "object": {
+      "sha": "6789da3be3f4f8eb5040422a065da6c1ef3f3b0d",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/6789da3be3f4f8eb5040422a065da6c1ef3f3b0d"
+    }
+  },
+  {
     "ref": "refs/tags/5.0.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMC4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.0.0",
@@ -4850,6 +5120,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.0.17",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMC4xNw==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.0.17",
+    "object": {
+      "sha": "c889412be5e88c214377a307d84de8db1a015c9a",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/c889412be5e88c214377a307d84de8db1a015c9a"
+    }
+  },
+  {
+    "ref": "refs/tags/5.0.18",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMC4xOA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.0.18",
+    "object": {
+      "sha": "3c1521cf0e6703d3228435822e1a4f1ccf6e8648",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/3c1521cf0e6703d3228435822e1a4f1ccf6e8648"
+    }
+  },
+  {
     "ref": "refs/tags/5.1.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMS4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.1.0",
@@ -4987,6 +5277,26 @@
       "sha": "195a0fb29c40baa829e4513fde58be0dbb4afe34",
       "type": "commit",
       "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/195a0fb29c40baa829e4513fde58be0dbb4afe34"
+    }
+  },
+  {
+    "ref": "refs/tags/5.1.14",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMS4xNA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.1.14",
+    "object": {
+      "sha": "af6106e2b8d335ceb8d420030803d573d388dd8a",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/af6106e2b8d335ceb8d420030803d573d388dd8a"
+    }
+  },
+  {
+    "ref": "refs/tags/5.1.15",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMS4xNQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.1.15",
+    "object": {
+      "sha": "29064f916ede1e92eec2bb5ef54d9a7878174203",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/29064f916ede1e92eec2bb5ef54d9a7878174203"
     }
   },
   {
@@ -5150,6 +5460,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.2.16",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMi4xNg==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.2.16",
+    "object": {
+      "sha": "d5deb37c6b6308333cb3bc02aa340a34e659e09a",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/d5deb37c6b6308333cb3bc02aa340a34e659e09a"
+    }
+  },
+  {
+    "ref": "refs/tags/5.2.17",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMi4xNw==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.2.17",
+    "object": {
+      "sha": "5c5d5e387fbf9204fd8893dd4a871f7b73d6f8ba",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/5c5d5e387fbf9204fd8893dd4a871f7b73d6f8ba"
+    }
+  },
+  {
     "ref": "refs/tags/5.3.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMy4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.3.0",
@@ -5280,6 +5610,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.3.13",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMy4xMw==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.3.13",
+    "object": {
+      "sha": "c720dd057586ec8051358cf58213187950808927",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/c720dd057586ec8051358cf58213187950808927"
+    }
+  },
+  {
+    "ref": "refs/tags/5.3.14",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuMy4xNA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.3.14",
+    "object": {
+      "sha": "6b3c2b1e20d301994372ae23d724b3ebc69b1754",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/6b3c2b1e20d301994372ae23d724b3ebc69b1754"
+    }
+  },
+  {
     "ref": "refs/tags/5.4.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNC4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.4.0",
@@ -5390,6 +5740,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.4.11",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNC4xMQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.4.11",
+    "object": {
+      "sha": "7a5f49e181e820b1c482c68e067dd645ce141340",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/7a5f49e181e820b1c482c68e067dd645ce141340"
+    }
+  },
+  {
+    "ref": "refs/tags/5.4.12",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNC4xMg==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.4.12",
+    "object": {
+      "sha": "990a692c93b3559e72d66de6ae2fa011f7e5e911",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/990a692c93b3559e72d66de6ae2fa011f7e5e911"
+    }
+  },
+  {
     "ref": "refs/tags/5.5.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNS4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.5.0",
@@ -5490,6 +5860,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.5.10",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNS4xMA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.5.10",
+    "object": {
+      "sha": "35f6b11744e54b995e05a7b5301ba3544f65fd5a",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/35f6b11744e54b995e05a7b5301ba3544f65fd5a"
+    }
+  },
+  {
+    "ref": "refs/tags/5.5.11",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNS4xMQ==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.5.11",
+    "object": {
+      "sha": "887bb02dda9c649d75ab66bd9af95e31bcdfe0c3",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/887bb02dda9c649d75ab66bd9af95e31bcdfe0c3"
+    }
+  },
+  {
     "ref": "refs/tags/5.6.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNi4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.6.0",
@@ -5580,6 +5970,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.6.9",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNi45",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.6.9",
+    "object": {
+      "sha": "76ef07b368fb3a3481db7cb7fe1292317c3b64da",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/76ef07b368fb3a3481db7cb7fe1292317c3b64da"
+    }
+  },
+  {
+    "ref": "refs/tags/5.6.10",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNi4xMA==",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.6.10",
+    "object": {
+      "sha": "f26b78ecb39fe88d4271c921388a69006979d1e3",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/f26b78ecb39fe88d4271c921388a69006979d1e3"
+    }
+  },
+  {
     "ref": "refs/tags/5.7.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNy4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.7.0",
@@ -5650,6 +6060,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.7.7",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNy43",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.7.7",
+    "object": {
+      "sha": "e8449bc901df8559be9c8f5d84093607d1807785",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/e8449bc901df8559be9c8f5d84093607d1807785"
+    }
+  },
+  {
+    "ref": "refs/tags/5.7.8",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuNy44",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.7.8",
+    "object": {
+      "sha": "5037287442cfbdaee38e468ccae818c53bc79cc2",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/5037287442cfbdaee38e468ccae818c53bc79cc2"
+    }
+  },
+  {
     "ref": "refs/tags/5.8.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuOC4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.8.0",
@@ -5700,6 +6130,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.8.5",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuOC41",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.8.5",
+    "object": {
+      "sha": "be568eaab9d7945248e5df23ada2078dea412f23",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/be568eaab9d7945248e5df23ada2078dea412f23"
+    }
+  },
+  {
+    "ref": "refs/tags/5.8.6",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuOC42",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.8.6",
+    "object": {
+      "sha": "78173e9773eea728774bec1c6556c29ad46a76e9",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/78173e9773eea728774bec1c6556c29ad46a76e9"
+    }
+  },
+  {
     "ref": "refs/tags/5.9.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuOS4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.9.0",
@@ -5740,6 +6190,26 @@
     }
   },
   {
+    "ref": "refs/tags/5.9.4",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuOS40",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.9.4",
+    "object": {
+      "sha": "82c2ce127182a9530b678a15b0b88643a17997f8",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/82c2ce127182a9530b678a15b0b88643a17997f8"
+    }
+  },
+  {
+    "ref": "refs/tags/5.9.5",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzUuOS41",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/5.9.5",
+    "object": {
+      "sha": "7268fe465f2589a7dc793e3f93aceea763f1aded",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/7268fe465f2589a7dc793e3f93aceea763f1aded"
+    }
+  },
+  {
     "ref": "refs/tags/6.0.0",
     "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzYuMC4w",
     "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/6.0.0",
@@ -5747,6 +6217,56 @@
       "sha": "1c0a2efa5eac05dfd3b7d2b9cfe68e02da55b966",
       "type": "commit",
       "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/1c0a2efa5eac05dfd3b7d2b9cfe68e02da55b966"
+    }
+  },
+  {
+    "ref": "refs/tags/6.0.1",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzYuMC4x",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/6.0.1",
+    "object": {
+      "sha": "908d401880b3cd42e419a43f01f005ff2466c631",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/908d401880b3cd42e419a43f01f005ff2466c631"
+    }
+  },
+  {
+    "ref": "refs/tags/6.0.2",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzYuMC4y",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/6.0.2",
+    "object": {
+      "sha": "2bb5679d666474d024352fa53f07344affef7e69",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/2bb5679d666474d024352fa53f07344affef7e69"
+    }
+  },
+  {
+    "ref": "refs/tags/6.0.3",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzYuMC4z",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/6.0.3",
+    "object": {
+      "sha": "75f4a8a2a567b28283fd4d457a713a5e770df216",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/75f4a8a2a567b28283fd4d457a713a5e770df216"
+    }
+  },
+  {
+    "ref": "refs/tags/6.1.0",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzYuMS4w",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/6.1.0",
+    "object": {
+      "sha": "e33c9f3203961a823ec8410fc1481f6c87b4e3db",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/e33c9f3203961a823ec8410fc1481f6c87b4e3db"
+    }
+  },
+  {
+    "ref": "refs/tags/6.1.1",
+    "node_id": "MDM6UmVmNzU2NDU2NTk6cmVmcy90YWdzLzYuMS4x",
+    "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/refs/tags/6.1.1",
+    "object": {
+      "sha": "031cedc06d612c4a74f7b6d3e77d8145f2954a25",
+      "type": "commit",
+      "url": "https://api.github.com/repos/WordPress/wordpress-develop/git/commits/031cedc06d612c4a74f7b6d3e77d8145f2954a25"
     }
   }
 ]
