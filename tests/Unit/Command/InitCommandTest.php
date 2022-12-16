@@ -201,7 +201,7 @@ it("checks that the command creates folder with correct templates for a plugin",
 	$bootstrapContents = file_get_contents($bootstrapFilePath);
 
 	expect($bootstrapContents)->toContain("tests_add_filter('muplugins_loaded', '_manually_load_plugin');");
-	expect($bootstrapContents)->toContain("require dirname(dirname(__FILE__)) . '/fake-plugin.php';");
+	expect($bootstrapContents)->toContain("require dirname(__DIR__) . '/fake-plugin.php';");
 
 	// Check if the mock file was unzipped.
 	$wpFolderPath = $this->outputDir . $ds . 'wp' . $ds . 'src' . $ds . 'hello.txt';
