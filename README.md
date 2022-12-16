@@ -105,8 +105,9 @@ Not running external-http tests. To execute these, use --group external-http.
 
    PASS  Tests\Integration\ExampleTest
   ✓ Rest API endpoints work
+  ✓ Creating terms in category works
 
-  Tests:  1 passed
+  Tests:  2 passed
   Time:   0.14s
 ```
 
@@ -121,7 +122,7 @@ If you want to run the package as a part of your continuous integration (CI) pip
 ### Why such a high PHP version? What if I need to test my theme/plugin on other PHP versions?
 
 Underlying aim of this package (besides getting WordPress developers more acquainted to testing) is to urge the developers to update their projects, and use more modern PHP features. 
-While WordPress supports PHP 5.6, it's no longer even supported with security patches (at the time of writing this PHP 7.3 is in the [EOL phase](https://www.php.net/supported-versions.php)).
+While WordPress supports PHP 5.6, it's no longer even supported with security patches (at the time of writing this PHP 7.4 is in the [EOL phase](https://www.php.net/supported-versions.php)).
 
 The WordPress community needs to move on, and if this package will help somebody to update their servers and PHP version I'll call that a success.
 
@@ -129,12 +130,67 @@ The WordPress community needs to move on, and if this package will help somebody
 
 It's not stuck! 😂 
 
-You're probably running this in WSL, right. For some reason, download on WSL terminal _can_ be slow. When I tested it , it took me some 5-10 minutes to download 30MB file. It took me some 10 seconds on Mac 🤷🏼‍♂️.  
+You're probably running this in WSL, right? For some reason, download on WSL terminal _can_ be slow.  
+This is a [known issue](https://github.com/microsoft/WSL/issues/4901).
+
+The solution is probably to disable some network adapters, as [described here](https://github.com/microsoft/WSL/issues/4901#issuecomment-1192517363) (you can also read a [tl;dr version](https://github.com/microsoft/WSL/issues/4901#issuecomment-1203857953) 😅).
 
 ### It's not working on Windows
 
-I haven't tested it yet on native Windows installation. This is on my to do list.
+I haven't tested it yet on native Windows installation. This is on my to do list, but not high on the priority list.
 
 ### Something is not working
 
 Please do [open an issue](/issues) for that.
+
+## Updates
+
+### 1.6.0 version
+
+I've decided to change the name to a more catchy `wp-pest`. To be honest, not sure why I haven't done this before.
+The functionality stays the same.
+
+If you've just downloaded and set up the testing from scratch on version 1.6.0, then you're all set, happy testing!  
+If not, you should probably update your `phpunit.xml` file to include
+
+```xml
+<env name="WP_TESTS_DIR" value="wp/tests/phpunit"/>
+```
+
+in the `<php>` part of the configuration.
+
+Also, update your `bootstrap.php` file according to the templates in the package. Namely you should remove the line at the end
+
+```php
+require_once dirname(__FILE__, 2) . '/wp/tests/phpunit/includes/bootstrap.php';
+```
+
+with 
+
+```php
+require_once dirname(__DIR__) . '/vendor/yoast/wp-test-utils/src/WPIntegration/bootstrap-functions.php';
+
+WPIntegration\bootstrap_it();
+```
+
+Make sure you import the namespace for the `bootstrap_it()` function at the top of the file
+
+```php
+use Yoast\WPTestUtils\WPIntegration;
+```
+
+Last, but really important, remove the `Integration` in the `Pest.php` file
+
+```php
+uses(TestCase::class)->in('Unit', 'Integration');
+```
+
+And add
+
+```php
+use Yoast\WPTestUtils\WPIntegration\TestCase;
+
+uses(TestCase::class);
+```
+
+At the top of every integration test you have. This will ensure a correct base test class is used for integration tests.
