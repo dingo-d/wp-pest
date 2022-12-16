@@ -8,6 +8,11 @@ This projects adheres to [Semantic Versioning](https://semver.org/) and [Keep a 
 
 _No documentation available about unreleased changes as of yet._
 
+## [1.6.1] Add PHP 8.2 test matrix
+
+### Added
+- PHP 8.2 to the test matrix to ensure nothing is failing on PHP 8.2
+
 ## [1.6.0] Update integration tests and package name
 
 ### Changed
@@ -74,6 +79,7 @@ None of this is a BC break, as your tests will work. This jsut makes it work a b
 - Added the functionality for the WordPress integration tests with PestPHP package.
 
 [Unreleased]: https://github.com/dingo-d/wp-pest-integration-test-setup/compare/main...HEAD
+[1.6.0]: https://github.com/https://github.com/dingo-d/wp-pest-integration-test-setup/compare/1.6.0...1.6.1
 [1.6.0]: https://github.com/https://github.com/dingo-d/wp-pest-integration-test-setup/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/https://github.com/dingo-d/wp-pest-integration-test-setup/compare/1.4.1...1.5.0
 [1.4.1]: https://github.com/https://github.com/dingo-d/wp-pest-integration-test-setup/compare/1.4.0...1.4.1
