@@ -68,6 +68,34 @@ For an in-depth reasoning and explanation of how this package came to be, you ca
 
 Basically what's "under the hood" is downloaded [wordpress-develop](https://github.com/WordPress/wordpress-develop) repository to your project, added an in memory DB (sql lite from [aaemnnosttv/wp-sqlite-db](https://github.com/aaemnnosttv/wp-sqlite-db)), and a base test class from [Yoast/wp-test-utils](https://github.com/Yoast/wp-test-utils). All that combined allows you to run integration tests in WordPress with Pest PHP without any additional setup.
 
+## Running unit tests alongside integration tests
+
+Due to the bug in how Pest handles [file loading](https://github.com/pestphp/pest/issues/649), in order to successfully run the unit tests, you'll need to add the following helper to either your `Pest.php` file, or your `Helpers.php` file:
+
+```php
+function isUnitTest() {
+	return !empty($GLOBALS['argv']) && $GLOBALS['argv'][1] === '--group=unit';
+}
+```
+
+Then, in your **integration** tests, you'll need to add, before the test case `uses()` call
+
+```php
+<?php
+
+use Yoast\WPTestUtils\WPIntegration\TestCase;
+
+if (isUnitTest()) {
+	return;
+}
+
+uses(TestCase::class);
+
+// Rest of the tests.
+```
+
+This way, when you run the unit test group, the integration test files will bow out, and you won't get the wrong test class used for your test.
+
 ## Test example
 
 The command will set up two examples - one for unit test, one for integration test.
