@@ -21,12 +21,13 @@
     "ext-json": "*",
     "ext-zip": "*",
     "php": "^7.4 || ^8.0",
-    "aaemnnosttv/wp-sqlite-db": "^1.2",
+    "aaemnnosttv/wp-sqlite-db": "dev-master",
     "guzzlehttp/guzzle": "^7.4",
     "pestphp/pest": "^1.2",
     "symfony/filesystem": "^5.4",
     "yoast/phpunit-polyfills": "^1.0",
-    "yoast/wp-test-utils": "^1.0"
+    "yoast/wp-test-utils": "^1.0",
+    "composer/installers": "2"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
