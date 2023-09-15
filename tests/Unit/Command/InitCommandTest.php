@@ -2,7 +2,6 @@
 
 namespace MadeByDenis\WpPestIntegrationTestSetup\Tests\Unit\Command;
 
-use Brain\Monkey;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use MadeByDenis\WpPestIntegrationTestSetup\Command\InitCommand;
@@ -13,7 +12,6 @@ use Zenstruck\Console\Test\TestCommand;
 use function MadeByDenis\WpPestIntegrationTestSetup\Tests\{deleteOutputDir, mock};
 
 beforeEach(function () {
-	Monkey\setUp();
 	$ds = DIRECTORY_SEPARATOR;
 
 	$mock = new CustomMockHandler();
@@ -28,8 +26,6 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-	Monkey\tearDown();
-
 	// Clean up the output dir.
 	deleteOutputDir();
 });
@@ -39,7 +35,7 @@ it("checks that the command name is correct", function () {
 });
 
 it("checks that the command doesn't have default description", function () {
-	expect($this->command::getDefaultDescription())->toBeNull();
+	expect($this->command::getDefaultDescription())->toBe('Sets up the test suites.');
 });
 
 it("checks that the command throws error when arguments aren't specified", function () {
@@ -341,6 +337,7 @@ it('deletes the drop-in folder if the cleanup is confirmed', function () {
 	$ds = DIRECTORY_SEPARATOR;
 
 	// Add the wp-content folder in the output of the tests.
+	mkdir($this->outputDir);
 	mkdir($this->outputDir . $ds . 'wp-content');
 
 	TestCommand::for($this->command)
@@ -351,6 +348,6 @@ it('deletes the drop-in folder if the cleanup is confirmed', function () {
 	expect($this->outputDir . $ds . 'wp-content')->not->toBeDirectory();
 })->skip(
 	true,
-	'This test will only work if we run it on its own or in process isolation (not available in Pest v1)
+	'This test will only work if we run it on its own or in process isolation (not available in Pest atm)
 	due to method overloading of SymfonyStyle confirm.'
 );

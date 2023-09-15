@@ -33,7 +33,7 @@ final class CustomMockHandler
 		$ds = DIRECTORY_SEPARATOR;
 		$path = $request->getUri()->getPath();
 
-		if (strpos($path, 'wordpress-develop/archive') !== false) {
+		if (str_contains($path, 'wordpress-develop/archive')) {
 			$zipContents = (string)file_get_contents(
 				dirname(__DIR__) . $ds . 'stubs' . $ds . 'wordpress-develop-6.1.1.zip'
 			);
@@ -58,7 +58,7 @@ final class CustomMockHandler
 			}
 
 			$body = 'ZIP file';
-		} elseif (strpos(InitCommand::WP_API_TAGS, $path) !== false) {
+		} elseif (str_contains(InitCommand::WP_API_TAGS, $path)) {
 			$body = $versions;
 		} else {
 			$body = 'Nothing matched';
