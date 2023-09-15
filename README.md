@@ -2,6 +2,10 @@
 
 A package that will add WordPress integration and unit test suites using [Pest PHP](https://pestphp.com/) testing framework.
 
+## v2 Update Notice
+
+The v2 uses Pest v2, which uses PHPUnit 10, and the limit to that is that it only works with PHP 8.1+. If you want to use this package with PHP 7.4, use v1 (this uses Pest v1).
+
 ## Why bother?
 
 When somebody mentions automated testing, WordPress doesn't really come to mind, right? Hopefully, this package will help break the stigma of testing in WordPress.
@@ -10,7 +14,7 @@ This package will enable you to get up and running in no time with easy and read
 
 ## Requirements
 
-1. PHP > 7.4
+1. PHP > 8.1
 2. Composer
 
 This package will only work with Composer, I don't plan on supporting alternative ways of installations.
