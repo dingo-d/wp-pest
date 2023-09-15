@@ -27,12 +27,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.4, 8.0, 8.1]
+        php: [7.4, 8.0, 8.1, 8.2]
+        allowed_failure: [false]
+        include:
+          - php: 8.3
+            allowed_failure: true
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: PHP setup
         uses: shivammathur/setup-php@v2
         with:
@@ -40,8 +41,13 @@ jobs:
           coverage: none
           tools: cs2pr
 
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
+        with:
+          custom-cache-suffix: $(date -u "+%Y-%m")
 
       - name: Check coding standards using PHPCS
         run: composer test:style -- --report-full --report-checkstyle=./phpcs-report.xml
@@ -55,11 +61,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.4, 8.0, 8.1]
+        php: [7.4, 8.0, 8.1, 8.2]
+        allowed_failure: [false]
+        include:
+          - php: 8.3
+            allowed_failure: true
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: PHP setup
         uses: shivammathur/setup-php@v2
@@ -69,6 +79,8 @@ jobs:
 
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
+        with:
+          custom-cache-suffix: $(date -u "+%Y-%m")
 
       - name: Check code consistency using PHPStan
         run: composer test:types
