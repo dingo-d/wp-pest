@@ -10,12 +10,9 @@
 
 namespace MadeByDenis\WpPestIntegrationTestSetup\Tests;
 
-use FilesystemIterator;
 use Mockery;
 use Mockery\MockInterface;
 use Mockery\LegacyMockInterface;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -27,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @return MockInterface|LegacyMockInterface
  */
-function mock(string $class)
+function mock(string $class): MockInterface | LegacyMockInterface
 {
 	return Mockery::mock($class);
 }
