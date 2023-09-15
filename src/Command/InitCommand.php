@@ -36,9 +36,9 @@ use ZipArchive;
  * @since 1.0.0
  */
 #[AsCommand(
-    name: 'setup',
-    description: 'Sets up the test suites.',
-    hidden: false,
+	name: 'setup',
+	description: 'Sets up the test suites.',
+	hidden: false,
 )]
 class InitCommand extends Command
 {
