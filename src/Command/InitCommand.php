@@ -306,8 +306,13 @@ class InitCommand extends Command
 			if (!$this->filesystem->exists($testsDir)) {
 				$pluginSlug = $projectType === 'plugin' ? $pluginSlug : '';
 
-				// @phpstan-ignore-next-line
-				$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug);
+				if ($bedrock) {
+					// @phpstan-ignore-next-line
+					$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug, true);
+				} else {
+					// @phpstan-ignore-next-line
+					$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug);
+				}
 
 				$io->success('Folder and files created successfully.');
 			} else {
@@ -423,13 +428,14 @@ class InitCommand extends Command
 	 * @param string $testsPath Root path of the project.
 	 * @param string $projectType Type of project to set up. Default is theme.
 	 * @param string $pluginSlug Plugin slug.
+	 * @param bool $bedrock If install is bedrock type or not.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
 	 * @throws IOException Throws exception in case something fails with fs operations.
 	 */
-	private function setUpBasicTestFiles(string $testsPath, string $projectType = 'theme', string $pluginSlug = ''): void
+	private function setUpBasicTestFiles(string $testsPath, string $projectType = 'theme', string $pluginSlug = '', $bedrock = false): void
 	{
 		$ds = DIRECTORY_SEPARATOR;
 
@@ -438,7 +444,12 @@ class InitCommand extends Command
 		// Copy phpunit.xml.tmpl from templates folder.
 		$templatesFolder = dirname(__FILE__, 3) . $ds . 'templates';
 
-		$bootstrap = ($projectType === 'theme') ? 'bootstrap-theme.php.tmpl' : 'bootstrap-plugin.php.tmpl';
+		if ($bedrock) {
+			$bootstrap = ($projectType === 'theme') ? 'bootstrap-bedrock-theme.php.tmpl' : 'bootstrap-bedrock-plugin.php.tmpl';
+		} else {
+			$bootstrap = ($projectType === 'theme') ? 'bootstrap-theme.php.tmpl' : 'bootstrap-plugin.php.tmpl';
+		}
+
 		$bootstrapOutputPath = $testsPath . $ds . 'bootstrap.php';
 
 		$this->filesystem->copy($templatesFolder . $ds . 'phpunit.xml.tmpl', $this->rootPath . $ds . 'phpunit.xml');
@@ -585,24 +596,6 @@ class InitCommand extends Command
 	}
 
 	/**
-	 * Check for the validity of the plugin slug
-	 *
-	 * @link https://developer.wordpress.org/plugins/wordpress-org/plugin-developer-faq/#what-will-my-plugin-permalink-slug-be
-	 *
-	 * @param string $pluginSlug Plugin slug option passed to the command.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool True if the plugin slug is valid, false if not.
-	 */
-	private function checkIfPluginSlugIsValid(string $pluginSlug): bool
-	{
-		preg_match_all('/^[a-z\-\d_\p{Cyrillic}\p{Arabic}★\p{Han}]+$/mu', $pluginSlug, $matches, PREG_SET_ORDER);
-
-		return !empty($matches);
-	}
-
-	/**
 	 * Get all the tags from the GitHub
 	 *
 	 * @return string[] List of all the available GitHub tagged versions.
@@ -675,5 +668,23 @@ class InitCommand extends Command
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check for the validity of the plugin slug
+	 *
+	 * @link https://developer.wordpress.org/plugins/wordpress-org/plugin-developer-faq/#what-will-my-plugin-permalink-slug-be
+	 *
+	 * @param string $pluginSlug Plugin slug option passed to the command.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool True if the plugin slug is valid, false if not.
+	 */
+	private function checkIfPluginSlugIsValid(string $pluginSlug): bool
+	{
+		preg_match_all('/^[a-z\-\d_\p{Cyrillic}\p{Arabic}★\p{Han}]+$/mu', $pluginSlug, $matches, PREG_SET_ORDER);
+
+		return !empty($matches);
 	}
 }
