@@ -72,7 +72,7 @@ class InitCommand extends Command
 	/**
 	 * Theme slug option string
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @var string
 	 */
@@ -99,7 +99,7 @@ class InitCommand extends Command
 	/**
 	 * Setup wp-pest for bedrock configuration
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @var string
 	 */
@@ -184,7 +184,7 @@ class InitCommand extends Command
 	/**
 	 * Configures the current command
 	 *
-	 * @since 1.7.0 Add option to specify theme folder and add option for Bedrock support.
+	 * @since 2.0.0 Add option to specify theme folder and add option for Bedrock support.
 	 * @since 1.4.0 Add option to skip deletion of the wp-content folder.
 	 * @since 1.0.0
 	 *
@@ -244,7 +244,7 @@ class InitCommand extends Command
 	 * @param InputInterface $input Command input values.
 	 * @param OutputInterface $output Command output.
 	 *
-	 * @since 1.7.0 Add bedrock support.
+	 * @since 2.0.0 Add bedrock support.
 	 * @since 1.0.0
 	 *
 	 * @return int
@@ -644,7 +644,7 @@ class InitCommand extends Command
 	 * @param string $pluginSlug Plugin slug.
 	 * @param SymfonyStyle $io SymfonyStyle instance.
 	 *
-	 * @since 1.7.0
+	 * @since 2.0.0
 	 *
 	 * @return boolean
 	 */
