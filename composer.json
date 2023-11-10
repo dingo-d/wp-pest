@@ -53,7 +53,7 @@
     "test:types": "@php ./vendor/bin/phpstan",
     "test:style": "@php ./vendor/bin/phpcs",
     "test:unit": "@php ./vendor/bin/pest",
-    "test:coverage": "@php ./vendor/bin/pest --coverage",
+    "test:coverage": "@php -dxdebug.mode=coverage ./vendor/bin/pest --coverage",
     "test": [
       "@test:style",
       "@test:types",
