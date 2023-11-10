@@ -35,11 +35,6 @@ use ZipArchive;
  *
  * @since 1.0.0
  */
-#[AsCommand(
-	name: 'setup',
-	description: 'Sets up the test suites.',
-	hidden: false,
-)]
 class InitCommand extends Command
 {
 	/**
@@ -165,6 +160,15 @@ class InitCommand extends Command
 	private ClientInterface $client;
 
 	/**
+	 * Command name property
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var string Command name.
+	 */
+	protected static $defaultName = 'setup';
+
+	/**
 	 * Command class constructor
 	 *
 	 * @since 1.0.0
@@ -193,6 +197,7 @@ class InitCommand extends Command
 	protected function configure(): void
 	{
 		$this
+			->setDescription('Sets up the test suites.')
 			->setHelp('This command helps you set up WordPress integration and unit test suites.')
 			->addArgument(
 				self::PROJECT_TYPE,
