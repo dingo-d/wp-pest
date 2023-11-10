@@ -229,6 +229,31 @@ it("checks that the command creates folder with correct templates for a theme", 
 	expect($bootstrapContents)->toContain('\tests_add_filter(\'muplugins_loaded\', \'_register_theme\');');
 });
 
+it("checks that the command creates folder with correct templates for a theme with bedrock", function () {
+
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytwentyfour')
+		->addOption('--bedrock')
+		->execute()
+		->assertSuccessful();
+
+	// Check if the files were created, as intended.
+	expect($this->outputDir)->toBeDirectory();
+
+	$ds = DIRECTORY_SEPARATOR;
+
+	$bootstrapFilePath = "{$this->outputDir}{$ds}web{$ds}app{$ds}themes{$ds}twentytwentyfour{$ds}tests{$ds}bootstrap.php";
+
+	// Check if correct file is copied over.
+	expect($bootstrapFilePath)->toBeReadableFile();
+
+	// Ensure the contents are correct.
+	$bootstrapContents = file_get_contents($bootstrapFilePath);
+
+	expect($bootstrapContents)->toContain('\tests_add_filter(\'muplugins_loaded\', \'_register_theme\');');
+});
+
 it("checks that the command will fail if the theme slug is not provided", function () {
 	TestCommand::for($this->command)
 		->addArgument('theme')

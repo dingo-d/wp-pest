@@ -386,7 +386,11 @@ class InitCommand extends Command
 
 		// This is a dirty hack so that the test pass.
 		if (isset($_ENV['WP_PEST_TESTING']) && $_ENV['WP_PEST_TESTING']) {
-			$packageDropIn = dirname($this->rootPath, 2) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+			if ($bedrock) {
+				$packageDropIn = dirname($this->rootPath, 6) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+			} else {
+				$packageDropIn = dirname($this->rootPath, 2) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+			}
 		}
 
 		if (!$this->filesystem->exists($coreDropInPath)) {
