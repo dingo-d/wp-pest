@@ -154,7 +154,8 @@ If you want to run the package as a part of your continuous integration (CI) pip
 ### Why such a high PHP version? What if I need to test my theme/plugin on other PHP versions?
 
 Underlying aim of this package (besides getting WordPress developers more acquainted to testing) is to urge the developers to update their projects, and use more modern PHP features. 
-While WordPress supports PHP 5.6, it's no longer even supported with security patches (at the time of writing this PHP 7.4 is in the [EOL phase](https://www.php.net/supported-versions.php)).
+
+7.4 is already EOL since November 2021, and 8.0 is [EOL since November 2022](https://www.php.net/supported-versions.php).
 
 The WordPress community needs to move on, and if this package will help somebody to update their servers and PHP version I'll call that a success.
 
@@ -191,7 +192,7 @@ If not, you should probably update your `phpunit.xml` file to include
 
 in the `<php>` part of the configuration.
 
-Also, update your `bootstrap.php` file according to the templates in the package. Namely you should remove the line at the end
+Also, update your `bootstrap.php` file according to the templates in the package. Namely, you should remove the line at the end
 
 ```php
 require_once dirname(__FILE__, 2) . '/wp/tests/phpunit/includes/bootstrap.php';
