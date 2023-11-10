@@ -4,7 +4,7 @@ use Yoast\WPTestUtils\WPIntegration;
 
 // Autoload everything for unit tests.
 $ds = DIRECTORY_SEPARATOR;
-require_once dirname(__DIR__) . $ds . 'vendor' . $ds . 'autoload.php';
+require_once dirname(__DIR__, 5) . $ds . 'vendor' . $ds . 'autoload.php';
 
 /**
  * Include core bootstrap for an integration test suite
@@ -68,7 +68,7 @@ if (isset($GLOBALS['argv']) && in_array('--group=integration', $GLOBALS['argv'],
 
 	\tests_add_filter('muplugins_loaded', '_register_theme');
 
-	require_once dirname(__DIR__) . '/vendor/yoast/wp-test-utils/src/WPIntegration/bootstrap-functions.php';
+	require_once dirname(__DIR__, 5) . '/vendor/yoast/wp-test-utils/src/WPIntegration/bootstrap-functions.php';
 
 	/*
 	 * Bootstrap WordPress. This will also load the Composer autoload file, the PHPUnit Polyfills
