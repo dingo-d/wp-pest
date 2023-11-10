@@ -55,7 +55,8 @@ it("checks that the command throws error when plugin slug isn't provided for plu
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->execute()
-		->assertStatusCode(1);
+		->assertStatusCode(1)
+		->assertOutputContains("Plugin slug must be provided and a be string.");
 });
 
 it("checks that the command throws error if the wp directory already exists", function () {
@@ -210,6 +211,7 @@ it("checks that the command creates folder with correct templates for a theme", 
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->execute()
 		->assertSuccessful();
 
@@ -227,9 +229,18 @@ it("checks that the command creates folder with correct templates for a theme", 
 	expect($bootstrapContents)->toContain('\tests_add_filter(\'muplugins_loaded\', \'_register_theme\');');
 });
 
+it("checks that the command will fail if the theme slug is not provided", function () {
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->execute()
+		->assertStatusCode(1)
+		->assertOutputContains("Theme slug must be provided and a be string.");
+});
+
 it("checks that attempting to download wrong WordPress version will throw an exception", function ($versions) {
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->addOption('--wp-version', $versions)
 		->execute()
 		->assertStatusCode(1)
@@ -245,6 +256,7 @@ it("checks that attempting to download wrong WordPress version will throw an exc
 it("checks that attempting to download WordPress version will work", function ($versions) {
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->addOption('--wp-version', $versions)
 		->execute()
 		->assertSuccessful();
@@ -259,6 +271,7 @@ it('checks that the database dropin is copied over correctly', function () {
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->execute()
 		->assertSuccessful();
 
@@ -283,6 +296,7 @@ it('checks that the database dropin is copied over correctly', function () {
 it('checks that skipping delete will work', function () {
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->addOption('skip-delete')
 		->execute()
 		->assertSuccessful();
@@ -293,6 +307,7 @@ it('checks that the WordPress Core is copied over correctly', function () {
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->execute()
 		->assertSuccessful();
 
@@ -342,6 +357,7 @@ it('deletes the drop-in folder if the cleanup is confirmed', function () {
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->execute()
 		->assertSuccessful();
 
