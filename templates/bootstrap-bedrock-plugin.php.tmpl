@@ -4,7 +4,7 @@ use Yoast\WPTestUtils\WPIntegration;
 
 // Autoload everything for unit tests.
 $ds = DIRECTORY_SEPARATOR;
-require_once dirname(__DIR__) . $ds . 'vendor' . $ds . 'autoload.php';
+require_once dirname(__DIR__, 5) . $ds . 'vendor' . $ds . 'autoload.php';
 
 /**
  * Include core bootstrap for an integration test suite
@@ -43,32 +43,16 @@ if (isset($GLOBALS['argv']) && in_array('--group=integration', $GLOBALS['argv'],
 	require_once dirname(__DIR__) . '/wp/tests/phpunit/includes/functions.php';
 
 	/**
-	 * Register mock theme.
+	 * Manually load the plugin being tested.
 	 */
-	function _register_theme()
+	function _manually_load_plugin()
 	{
-		$themeDir = dirname(__DIR__);
-		$currentTheme = basename($themeDir);
-		$themeRoot = dirname($themeDir);
-
-		\add_filter('theme_root', function () use ($themeRoot) {
-			return $themeRoot;
-		});
-
-		\register_theme_directory($themeRoot);
-
-		\add_filter('pre_option_template', function () use ($currentTheme) {
-			return $currentTheme;
-		});
-
-		\add_filter('pre_option_stylesheet', function () use ($currentTheme) {
-			return $currentTheme;
-		});
+		require dirname(__DIR__) . '/%%%PLUGIN-SLUG%%%.php';
 	}
 
-	\tests_add_filter('muplugins_loaded', '_register_theme');
+	tests_add_filter('muplugins_loaded', '_manually_load_plugin');
 
-	require_once dirname(__DIR__) . '/vendor/yoast/wp-test-utils/src/WPIntegration/bootstrap-functions.php';
+	require_once dirname(__DIR__, 5) . '/vendor/yoast/wp-test-utils/src/WPIntegration/bootstrap-functions.php';
 
 	/*
 	 * Bootstrap WordPress. This will also load the Composer autoload file, the PHPUnit Polyfills

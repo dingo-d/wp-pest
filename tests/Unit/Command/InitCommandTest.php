@@ -35,7 +35,7 @@ it("checks that the command name is correct", function () {
 });
 
 it("checks that the command doesn't have default description", function () {
-	expect($this->command::getDefaultDescription())->toBe('Sets up the test suites.');
+	expect($this->command::getDefaultDescription())->toBeNull();
 });
 
 it("checks that the command throws error when arguments aren't specified", function () {
@@ -55,7 +55,8 @@ it("checks that the command throws error when plugin slug isn't provided for plu
 	TestCommand::for($this->command)
 		->addArgument('plugin')
 		->execute()
-		->assertStatusCode(1);
+		->assertStatusCode(1)
+		->assertOutputContains("Plugin slug must be provided and a be string.");
 });
 
 it("checks that the command throws error if the wp directory already exists", function () {
@@ -210,6 +211,7 @@ it("checks that the command creates folder with correct templates for a theme", 
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->execute()
 		->assertSuccessful();
 
@@ -227,9 +229,43 @@ it("checks that the command creates folder with correct templates for a theme", 
 	expect($bootstrapContents)->toContain('\tests_add_filter(\'muplugins_loaded\', \'_register_theme\');');
 });
 
+it("checks that the command creates folder with correct templates for a theme with bedrock", function () {
+
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytwentyfour')
+		->addOption('--bedrock')
+		->execute()
+		->assertSuccessful();
+
+	// Check if the files were created, as intended.
+	expect($this->outputDir)->toBeDirectory();
+
+	$ds = DIRECTORY_SEPARATOR;
+
+	$bootstrapFilePath = "{$this->outputDir}{$ds}web{$ds}app{$ds}themes{$ds}twentytwentyfour{$ds}tests{$ds}bootstrap.php";
+
+	// Check if correct file is copied over.
+	expect($bootstrapFilePath)->toBeReadableFile();
+
+	// Ensure the contents are correct.
+	$bootstrapContents = file_get_contents($bootstrapFilePath);
+
+	expect($bootstrapContents)->toContain('\tests_add_filter(\'muplugins_loaded\', \'_register_theme\');');
+});
+
+it("checks that the command will fail if the theme slug is not provided", function () {
+	TestCommand::for($this->command)
+		->addArgument('theme')
+		->execute()
+		->assertStatusCode(1)
+		->assertOutputContains("Theme slug must be provided and a be string.");
+});
+
 it("checks that attempting to download wrong WordPress version will throw an exception", function ($versions) {
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->addOption('--wp-version', $versions)
 		->execute()
 		->assertStatusCode(1)
@@ -245,6 +281,7 @@ it("checks that attempting to download wrong WordPress version will throw an exc
 it("checks that attempting to download WordPress version will work", function ($versions) {
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->addOption('--wp-version', $versions)
 		->execute()
 		->assertSuccessful();
@@ -259,6 +296,7 @@ it('checks that the database dropin is copied over correctly', function () {
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->execute()
 		->assertSuccessful();
 
@@ -283,6 +321,7 @@ it('checks that the database dropin is copied over correctly', function () {
 it('checks that skipping delete will work', function () {
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->addOption('skip-delete')
 		->execute()
 		->assertSuccessful();
@@ -293,6 +332,7 @@ it('checks that the WordPress Core is copied over correctly', function () {
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->execute()
 		->assertSuccessful();
 
@@ -342,6 +382,7 @@ it('deletes the drop-in folder if the cleanup is confirmed', function () {
 
 	TestCommand::for($this->command)
 		->addArgument('theme')
+		->addOption('--theme-slug', 'twentytentyfour')
 		->execute()
 		->assertSuccessful();
 

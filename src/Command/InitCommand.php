@@ -35,11 +35,6 @@ use ZipArchive;
  *
  * @since 1.0.0
  */
-#[AsCommand(
-	name: 'setup',
-	description: 'Sets up the test suites.',
-	hidden: false,
-)]
 class InitCommand extends Command
 {
 	/**
@@ -70,6 +65,15 @@ class InitCommand extends Command
 	private const PLUGIN_SLUG = 'plugin-slug';
 
 	/**
+	 * Theme slug option string
+	 *
+	 * @since 2.0.0
+	 *
+	 * @var string
+	 */
+	private const THEME_SLUG = 'theme-slug';
+
+	/**
 	 * Skip wp-content folder delete option string
 	 *
 	 * @since 1.4.0
@@ -86,6 +90,15 @@ class InitCommand extends Command
 	 * @var string
 	 */
 	private const FORCE = 'force';
+
+	/**
+	 * Setup wp-pest for bedrock configuration
+	 *
+	 * @since 2.0.0
+	 *
+	 * @var string
+	 */
+	private const BEDROCK = 'bedrock';
 
 	/**
 	 * WordPress GitHub tag zip url
@@ -147,6 +160,15 @@ class InitCommand extends Command
 	private ClientInterface $client;
 
 	/**
+	 * Command name property
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var string Command name.
+	 */
+	protected static $defaultName = 'setup';
+
+	/**
 	 * Command class constructor
 	 *
 	 * @since 1.0.0
@@ -166,6 +188,7 @@ class InitCommand extends Command
 	/**
 	 * Configures the current command
 	 *
+	 * @since 2.0.0 Add option to specify theme folder and add option for Bedrock support.
 	 * @since 1.4.0 Add option to skip deletion of the wp-content folder.
 	 * @since 1.0.0
 	 *
@@ -174,11 +197,12 @@ class InitCommand extends Command
 	protected function configure(): void
 	{
 		$this
+			->setDescription('Sets up the test suites.')
 			->setHelp('This command helps you set up WordPress integration and unit test suites.')
 			->addArgument(
 				self::PROJECT_TYPE,
 				InputArgument::REQUIRED,
-				'Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin"'
+				'Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin".'
 			)
 			->addOption(
 				self::WP_VERSION,
@@ -194,6 +218,12 @@ class InitCommand extends Command
 				'If you are setting the plugin tests provide the plugin slug.'
 			)
 			->addOption(
+				self::THEME_SLUG,
+				null,
+				InputOption::VALUE_OPTIONAL,
+				'If you are setting the theme tests provide the theme slug.'
+			)
+			->addOption(
 				self::SKIP_DELETE,
 				null,
 				InputOption::VALUE_NONE,
@@ -204,6 +234,12 @@ class InitCommand extends Command
 				null,
 				InputOption::VALUE_NONE,
 				'Force download of WordPress core files. This will overwrite everything in the wp folder.'
+			)
+			->addOption(
+				self::BEDROCK,
+				null,
+				InputOption::VALUE_NONE,
+				'Set up testing framework to work with Bedrock type of install.'
 			);
 	}
 
@@ -213,6 +249,7 @@ class InitCommand extends Command
 	 * @param InputInterface $input Command input values.
 	 * @param OutputInterface $output Command output.
 	 *
+	 * @since 2.0.0 Add bedrock support.
 	 * @since 1.0.0
 	 *
 	 * @return int
@@ -224,6 +261,8 @@ class InitCommand extends Command
 
 		$projectType = $input->getArgument(self::PROJECT_TYPE);
 		$pluginSlug = $input->getOption(self::PLUGIN_SLUG);
+		$themeSlug = $input->getOption(self::THEME_SLUG);
+		$bedrock = $input->getOption(self::BEDROCK);
 
 		if (!in_array($projectType, ['theme', 'plugin'], true)) {
 			// @phpstan-ignore-next-line
@@ -234,27 +273,29 @@ class InitCommand extends Command
 
 		if ($projectType === 'plugin') {
 			if (!is_string($pluginSlug)) {
-				$io->error('Plugin slug must be a string.');
+				$io->error('Plugin slug must be provided and a be string.');
 
 				return Command::FAILURE;
 			}
 
-			/**
-			 * Check if the plugin slug is less than 5 characters long.
-			 *
-			 * @link https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/plugin-directory/shortcodes/class-upload-handler.php#L173
-			 */
-			if (strlen($pluginSlug) < 5) {
-				$io->error('Plugin slug must be at least 5 characters long.');
-
+			if (!$this->isPluginSlugValid($pluginSlug, $io)) {
 				return Command::FAILURE;
 			}
+		}
 
-			if (!$this->checkIfPluginSlugIsValid($pluginSlug)) {
-				$io->error('Plugin slug must be written in lowercase, separated by a dash.');
+		if ($projectType === 'theme' && !is_string($themeSlug)) {
+			$io->error('Theme slug must be provided and a be string.');
 
-				return Command::FAILURE;
-			}
+			return Command::FAILURE;
+		}
+
+		if ($bedrock) {
+			// We need to put tests in the plugin or theme folder.
+			$originalRootPath = $this->rootPath;
+			$projectName = $projectType === 'plugin' ? $pluginSlug : $themeSlug;
+
+			// @phpstan-ignore-next-line
+			$this->rootPath = "{$this->rootPath}{$ds}web{$ds}app{$ds}{$projectType}s{$ds}{$projectName}";
 		}
 
 		$wpVersion = $input->getOption(self::WP_VERSION);
@@ -270,8 +311,13 @@ class InitCommand extends Command
 			if (!$this->filesystem->exists($testsDir)) {
 				$pluginSlug = $projectType === 'plugin' ? $pluginSlug : '';
 
-				// @phpstan-ignore-next-line
-				$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug);
+				if ($bedrock) {
+					// @phpstan-ignore-next-line
+					$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug, true);
+				} else {
+					// @phpstan-ignore-next-line
+					$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug);
+				}
 
 				$io->success('Folder and files created successfully.');
 			} else {
@@ -329,13 +375,22 @@ class InitCommand extends Command
 		 * Because the DB package is a WP drop-in, that means that the folder `wp-content/wp-sqlite-db`
 		 * will be copied in the project root (kinda annoying). So we need to manually clean that folder later.
 		 */
-		$packageDropIn = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+		if ($bedrock) {
+			$packageDropIn = $originalRootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+		} else {
+			$packageDropIn = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+		}
+
 		$coreDropInPath = $wpDir . $ds . 'src' . $ds . 'wp-content';
 		$coreDropIn = $coreDropInPath . $ds . 'db.php';
 
 		// This is a dirty hack so that the test pass.
 		if (isset($_ENV['WP_PEST_TESTING']) && $_ENV['WP_PEST_TESTING']) {
-			$packageDropIn = dirname($this->rootPath, 2) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+			if ($bedrock) {
+				$packageDropIn = dirname($this->rootPath, 6) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+			} else {
+				$packageDropIn = dirname($this->rootPath, 2) . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+			}
 		}
 
 		if (!$this->filesystem->exists($coreDropInPath)) {
@@ -357,7 +412,12 @@ class InitCommand extends Command
 		$cleanDbPackage = $io->confirm('Do you want to clean the DB package folder?', false);
 
 		if ($cleanDbPackage) {
-			$this->filesystem->remove($this->rootPath . $ds . 'wp-content');
+			if ($bedrock) {
+				$this->filesystem->remove($originalRootPath . $ds . 'wp-content');
+			} else {
+				$this->filesystem->remove($this->rootPath . $ds . 'wp-content');
+			}
+
 			$io->success('Database drop-in folder deleted successfully.');
 		}
 
@@ -377,13 +437,14 @@ class InitCommand extends Command
 	 * @param string $testsPath Root path of the project.
 	 * @param string $projectType Type of project to set up. Default is theme.
 	 * @param string $pluginSlug Plugin slug.
+	 * @param bool $bedrock If install is bedrock type or not.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
 	 * @throws IOException Throws exception in case something fails with fs operations.
 	 */
-	private function setUpBasicTestFiles(string $testsPath, string $projectType = 'theme', string $pluginSlug = ''): void
+	private function setUpBasicTestFiles(string $testsPath, string $projectType = 'theme', string $pluginSlug = '', $bedrock = false): void
 	{
 		$ds = DIRECTORY_SEPARATOR;
 
@@ -392,7 +453,12 @@ class InitCommand extends Command
 		// Copy phpunit.xml.tmpl from templates folder.
 		$templatesFolder = dirname(__FILE__, 3) . $ds . 'templates';
 
-		$bootstrap = ($projectType === 'theme') ? 'bootstrap-theme.php.tmpl' : 'bootstrap-plugin.php.tmpl';
+		if ($bedrock) {
+			$bootstrap = ($projectType === 'theme') ? 'bootstrap-bedrock-theme.php.tmpl' : 'bootstrap-bedrock-plugin.php.tmpl';
+		} else {
+			$bootstrap = ($projectType === 'theme') ? 'bootstrap-theme.php.tmpl' : 'bootstrap-plugin.php.tmpl';
+		}
+
 		$bootstrapOutputPath = $testsPath . $ds . 'bootstrap.php';
 
 		$this->filesystem->copy($templatesFolder . $ds . 'phpunit.xml.tmpl', $this->rootPath . $ds . 'phpunit.xml');
@@ -539,24 +605,6 @@ class InitCommand extends Command
 	}
 
 	/**
-	 * Check for the validity of the plugin slug
-	 *
-	 * @link https://developer.wordpress.org/plugins/wordpress-org/plugin-developer-faq/#what-will-my-plugin-permalink-slug-be
-	 *
-	 * @param string $pluginSlug Plugin slug option passed to the command.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool True if the plugin slug is valid, false if not.
-	 */
-	private function checkIfPluginSlugIsValid(string $pluginSlug): bool
-	{
-		preg_match_all('/^[a-z\-\d_\p{Cyrillic}\p{Arabic}★\p{Han}]+$/mu', $pluginSlug, $matches, PREG_SET_ORDER);
-
-		return !empty($matches);
-	}
-
-	/**
 	 * Get all the tags from the GitHub
 	 *
 	 * @return string[] List of all the available GitHub tagged versions.
@@ -597,5 +645,55 @@ class InitCommand extends Command
 		}
 
 		return $versions;
+	}
+
+	/**
+	 * Validate the plugin slug
+	 *
+	 * @param string $pluginSlug Plugin slug.
+	 * @param SymfonyStyle $io SymfonyStyle instance.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return boolean
+	 */
+	private function isPluginSlugValid(string $pluginSlug, SymfonyStyle $io): bool
+	{
+		/**
+		 * Check if the plugin slug is less than 5 characters long.
+		 *
+		 * @link https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/plugin-directory/shortcodes/class-upload-handler.php#L173
+		 */
+		if (strlen($pluginSlug) < 5) {
+			$io->error('Plugin slug must be at least 5 characters long.');
+
+			return false;
+		}
+
+		if (!$this->checkIfPluginSlugIsValid($pluginSlug)) {
+			$io->error('Plugin slug must be written in lowercase, separated by a dash.');
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check for the validity of the plugin slug
+	 *
+	 * @link https://developer.wordpress.org/plugins/wordpress-org/plugin-developer-faq/#what-will-my-plugin-permalink-slug-be
+	 *
+	 * @param string $pluginSlug Plugin slug option passed to the command.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool True if the plugin slug is valid, false if not.
+	 */
+	private function checkIfPluginSlugIsValid(string $pluginSlug): bool
+	{
+		preg_match_all('/^[a-z\-\d_\p{Cyrillic}\p{Arabic}★\p{Han}]+$/mu', $pluginSlug, $matches, PREG_SET_ORDER);
+
+		return !empty($matches);
 	}
 }

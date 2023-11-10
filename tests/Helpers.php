@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @return MockInterface|LegacyMockInterface
  */
-function mock(string $class): MockInterface | LegacyMockInterface
+function mock(string $class)
 {
 	return Mockery::mock($class);
 }

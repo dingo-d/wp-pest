@@ -4,7 +4,7 @@ use Yoast\WPTestUtils\WPIntegration;
 
 // Autoload everything for unit tests.
 $ds = DIRECTORY_SEPARATOR;
-require_once dirname(__FILE__, 2) . $ds . 'vendor' . $ds . 'autoload.php';
+require_once dirname(__DIR__) . $ds . 'vendor' . $ds . 'autoload.php';
 
 /**
  * Include core bootstrap for an integration test suite
@@ -15,15 +15,15 @@ require_once dirname(__FILE__, 2) . $ds . 'vendor' . $ds . 'autoload.php';
  * integration tests.
  */
 if (isset($GLOBALS['argv']) && in_array('--group=integration', $GLOBALS['argv'], true)) {
-	if (!file_exists(dirname(__FILE__, 2) . '/wp/tests/phpunit/wp-tests-config.php')) {
+	if (!file_exists(dirname(__DIR__) . '/wp/tests/phpunit/wp-tests-config.php')) {
 		// We need to set up core config details and test details
 		copy(
-			dirname(__FILE__, 2) . '/wp/wp-tests-config-sample.php',
-			dirname(__FILE__, 2) . '/wp/tests/phpunit/wp-tests-config.php'
+			dirname(__DIR__) . '/wp/wp-tests-config-sample.php',
+			dirname(__DIR__) . '/wp/tests/phpunit/wp-tests-config.php'
 		);
 
 		// Change certain constants from the test's config file.
-		$testConfigPath = dirname(__FILE__, 2) . '/wp/tests/phpunit/wp-tests-config.php';
+		$testConfigPath = dirname(__DIR__) . '/wp/tests/phpunit/wp-tests-config.php';
 		$testConfigContents = file_get_contents($testConfigPath);
 
 		$testConfigContents = str_replace(
@@ -40,7 +40,7 @@ if (isset($GLOBALS['argv']) && in_array('--group=integration', $GLOBALS['argv'],
 	}
 
 	// Give access to tests_add_filter() function.
-	require_once dirname(__FILE__, 2) . '/wp/tests/phpunit/includes/functions.php';
+	require_once dirname(__DIR__) . '/wp/tests/phpunit/includes/functions.php';
 
 	/**
 	 * Manually load the plugin being tested.
