@@ -70,6 +70,15 @@ class InitCommand extends Command
 	private const PLUGIN_SLUG = 'plugin-slug';
 
 	/**
+	 * Theme slug option string
+	 *
+	 * @since 1.7.0
+	 *
+	 * @var string
+	 */
+	private const THEME_SLUG = 'theme-slug';
+
+	/**
 	 * Skip wp-content folder delete option string
 	 *
 	 * @since 1.4.0
@@ -86,6 +95,15 @@ class InitCommand extends Command
 	 * @var string
 	 */
 	private const FORCE = 'force';
+
+	/**
+	 * Setup wp-pest for bedrock configuration
+	 *
+	 * @since 1.7.0
+	 *
+	 * @var string
+	 */
+	private const BEDROCK = 'bedrock';
 
 	/**
 	 * WordPress GitHub tag zip url
@@ -166,6 +184,7 @@ class InitCommand extends Command
 	/**
 	 * Configures the current command
 	 *
+	 * @since 1.7.0 Add option to specify theme folder and add option for Bedrock support.
 	 * @since 1.4.0 Add option to skip deletion of the wp-content folder.
 	 * @since 1.0.0
 	 *
@@ -178,7 +197,7 @@ class InitCommand extends Command
 			->addArgument(
 				self::PROJECT_TYPE,
 				InputArgument::REQUIRED,
-				'Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin"'
+				'Select whether you want to setup tests for theme or a plugin. Can be "theme" or "plugin".'
 			)
 			->addOption(
 				self::WP_VERSION,
@@ -194,6 +213,12 @@ class InitCommand extends Command
 				'If you are setting the plugin tests provide the plugin slug.'
 			)
 			->addOption(
+				self::THEME_SLUG,
+				null,
+				InputOption::VALUE_OPTIONAL,
+				'If you are setting the theme tests provide the theme slug.'
+			)
+			->addOption(
 				self::SKIP_DELETE,
 				null,
 				InputOption::VALUE_NONE,
@@ -204,6 +229,12 @@ class InitCommand extends Command
 				null,
 				InputOption::VALUE_NONE,
 				'Force download of WordPress core files. This will overwrite everything in the wp folder.'
+			)
+			->addOption(
+				self::BEDROCK,
+				null,
+				InputOption::VALUE_NONE,
+				'Set up testing framework to work with Bedrock type of install.'
 			);
 	}
 
@@ -213,6 +244,7 @@ class InitCommand extends Command
 	 * @param InputInterface $input Command input values.
 	 * @param OutputInterface $output Command output.
 	 *
+	 * @since 1.7.0 Add bedrock support.
 	 * @since 1.0.0
 	 *
 	 * @return int
@@ -224,6 +256,8 @@ class InitCommand extends Command
 
 		$projectType = $input->getArgument(self::PROJECT_TYPE);
 		$pluginSlug = $input->getOption(self::PLUGIN_SLUG);
+		$themeSlug = $input->getOption(self::THEME_SLUG);
+		$bedrock = $input->getOption(self::BEDROCK);
 
 		if (!in_array($projectType, ['theme', 'plugin'], true)) {
 			// @phpstan-ignore-next-line
@@ -234,27 +268,29 @@ class InitCommand extends Command
 
 		if ($projectType === 'plugin') {
 			if (!is_string($pluginSlug)) {
-				$io->error('Plugin slug must be a string.');
+				$io->error('Plugin slug must be provided and a be string.');
 
 				return Command::FAILURE;
 			}
 
-			/**
-			 * Check if the plugin slug is less than 5 characters long.
-			 *
-			 * @link https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/plugin-directory/shortcodes/class-upload-handler.php#L173
-			 */
-			if (strlen($pluginSlug) < 5) {
-				$io->error('Plugin slug must be at least 5 characters long.');
-
+			if (!$this->isPluginSlugValid($pluginSlug, $io)) {
 				return Command::FAILURE;
 			}
+		}
 
-			if (!$this->checkIfPluginSlugIsValid($pluginSlug)) {
-				$io->error('Plugin slug must be written in lowercase, separated by a dash.');
+		if ($projectType === 'theme' && !is_string($themeSlug)) {
+			$io->error('Theme slug must be provided and a be string.');
 
-				return Command::FAILURE;
-			}
+			return Command::FAILURE;
+		}
+
+		if ($bedrock) {
+			// We need to put tests in the plugin or theme folder.
+			$originalRootPath = $this->rootPath;
+			$projectName = $projectType === 'plugin' ? $pluginSlug : $themeSlug;
+
+			// @phpstan-ignore-next-line
+			$this->rootPath = "{$this->rootPath}{$ds}web{$ds}app{$ds}{$projectType}s{$ds}{$projectName}";
 		}
 
 		$wpVersion = $input->getOption(self::WP_VERSION);
@@ -329,7 +365,12 @@ class InitCommand extends Command
 		 * Because the DB package is a WP drop-in, that means that the folder `wp-content/wp-sqlite-db`
 		 * will be copied in the project root (kinda annoying). So we need to manually clean that folder later.
 		 */
-		$packageDropIn = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+		if ($bedrock) {
+			$packageDropIn = $originalRootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+		} else {
+			$packageDropIn = $this->rootPath . $ds . 'wp-content' . $ds . 'wp-sqlite-db' . $ds . 'src' . $ds . 'db.php';
+		}
+
 		$coreDropInPath = $wpDir . $ds . 'src' . $ds . 'wp-content';
 		$coreDropIn = $coreDropInPath . $ds . 'db.php';
 
@@ -357,7 +398,12 @@ class InitCommand extends Command
 		$cleanDbPackage = $io->confirm('Do you want to clean the DB package folder?', false);
 
 		if ($cleanDbPackage) {
-			$this->filesystem->remove($this->rootPath . $ds . 'wp-content');
+			if ($bedrock) {
+				$this->filesystem->remove($originalRootPath . $ds . 'wp-content');
+			} else {
+				$this->filesystem->remove($this->rootPath . $ds . 'wp-content');
+			}
+
 			$io->success('Database drop-in folder deleted successfully.');
 		}
 
@@ -597,5 +643,37 @@ class InitCommand extends Command
 		}
 
 		return $versions;
+	}
+
+	/**
+	 * Validate the plugin slug
+	 *
+	 * @param string $pluginSlug Plugin slug.
+	 * @param SymfonyStyle $io SymfonyStyle instance.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return boolean
+	 */
+	private function isPluginSlugValid(string $pluginSlug, SymfonyStyle $io): bool
+	{
+		/**
+		 * Check if the plugin slug is less than 5 characters long.
+		 *
+		 * @link https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/plugin-directory/shortcodes/class-upload-handler.php#L173
+		 */
+		if (strlen($pluginSlug) < 5) {
+			$io->error('Plugin slug must be at least 5 characters long.');
+
+			return false;
+		}
+
+		if (!$this->checkIfPluginSlugIsValid($pluginSlug)) {
+			$io->error('Plugin slug must be written in lowercase, separated by a dash.');
+
+			return false;
+		}
+
+		return true;
 	}
 }
