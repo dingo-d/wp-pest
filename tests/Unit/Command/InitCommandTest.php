@@ -35,7 +35,7 @@ it("checks that the command name is correct", function () {
 });
 
 it("checks that the command doesn't have default description", function () {
-	expect($this->command::getDefaultDescription())->toBe('Sets up the test suites.');
+	expect($this->command::getDefaultDescription())->toBeNull();
 });
 
 it("checks that the command throws error when arguments aren't specified", function () {
