@@ -27,7 +27,7 @@
     "ext-json": "*",
     "ext-zip": "*",
     "php": "^7.4 || ^8.0",
-    "aaemnnosttv/wp-sqlite-db": "^1.0.0",
+    "aaemnnosttv/wp-sqlite-db": "^1.4.0",
     "guzzlehttp/guzzle": "^7.4",
     "pestphp/pest": "^1.2",
     "symfony/filesystem": "^5.4",
