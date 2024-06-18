@@ -17,11 +17,17 @@
       "email": "denis.zoljom@gmail.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/dingo-d/wp-sqlite-db"
+    }
+  ],
   "require": {
     "ext-json": "*",
     "ext-zip": "*",
     "php": "^7.4 || ^8.0",
-    "aaemnnosttv/wp-sqlite-db": "^1.2",
+    "aaemnnosttv/wp-sqlite-db": "^1.0.0",
     "guzzlehttp/guzzle": "^7.4",
     "pestphp/pest": "^1.2",
     "symfony/filesystem": "^5.4",
@@ -60,6 +66,13 @@
       "@test:types",
       "@test:unit"
     ]
+  },
+  "scripts-descriptions": {
+    "test:types": "Run the PHPStan script cagainst the entire codebase.",
+    "test:style": "Run the PHPCS script against the entire codebase.",
+    "test:unit": "Run unit tests.",
+    "test:coverage": "Run unit tests with code coverage.",
+    "test": "Run all checks and tests."
   },
   "config": {
     "allow-plugins": {
