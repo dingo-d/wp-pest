@@ -8,6 +8,23 @@ This projects adheres to [Semantic Versioning](https://semver.org/) and [Keep a 
 
 _No documentation available about unreleased changes as of yet._
 
+## [1.8.0] Modernize dependencies and require PHP 8.2+
+
+### Changed
+- Raised the minimum PHP version to **8.2** (dropped support for 7.4, 8.0 and 8.1).
+- Switched the SQLite drop-in to the renamed `dingo-d/wp-sqlite-db` fork (`^1.4.1`), which carries the PHP 8.2+ dynamic property deprecation fixes.
+- Upgraded Symfony components to `^6.4` and migrated the command from the removed `static $defaultName` property to the `#[AsCommand]` attribute.
+- Upgraded PHPStan to `^2.0` and `phpstan/phpstan-symfony` to `^2.0`, and updated `phpstan.neon` for the removed configuration keys.
+- Switched Composer to stable stability (`minimum-stability: stable` + `prefer-stable`) so the lock resolves tagged releases instead of `dev` snapshots, and pinned `config.platform.php` to `8.2` for reproducible resolution.
+- Bumped `guzzlehttp/guzzle` (`^7.4 || ^8.0`), `squizlabs/php_codesniffer` (`^3.13`), `dealerdirect/phpcodesniffer-composer-installer` (`^1.0`) and `zenstruck/console-test` (`^1.8`).
+- CI now runs on PHP 8.2–8.4 (unit tests and static analysis), with updated `ramsey/composer-install@v3` and `codecov/codecov-action@v4`.
+
+### Fixed
+- The `test:unit`/`test:coverage` scripts and the scaffolded `phpunit.xml` now silence `E_DEPRECATED`, so Pest 1 boots and runs on PHP 8.4/8.5 (see the README FAQ for running Pest directly).
+
+### Note
+- Pest stays on `^1` (PHPUnit 9). WordPress core, `yoast/wp-test-utils` and the PHPUnit Polyfills are still capped at PHPUnit 9 (see [Trac #62004](https://core.trac.wordpress.org/ticket/62004)), so Pest 2/3 cannot boot the WordPress integration suite yet.
+
 ## [1.6.1] Add PHP 8.2 test matrix
 
 ### Added

@@ -10,7 +10,7 @@ This package will enable you to get up and running in no time with easy and read
 
 ## Requirements
 
-1. PHP > 7.4
+1. PHP >= 8.2
 2. Composer
 
 This package will only work with Composer, I don't plan on supporting alternative ways of installations.
@@ -66,7 +66,7 @@ Help:
 
 For an in-depth reasoning and explanation of how this package came to be, you can read [this article](https://madebydenis.com/wordpress-integration-tests-with-pest-php/).
 
-Basically what's "under the hood" is downloaded [wordpress-develop](https://github.com/WordPress/wordpress-develop) repository to your project, added an in memory DB (sql lite from [aaemnnosttv/wp-sqlite-db](https://github.com/aaemnnosttv/wp-sqlite-db)), and a base test class from [Yoast/wp-test-utils](https://github.com/Yoast/wp-test-utils). All that combined allows you to run integration tests in WordPress with Pest PHP without any additional setup.
+Basically what's "under the hood" is downloaded [wordpress-develop](https://github.com/WordPress/wordpress-develop) repository to your project, added an in memory DB (SQLite drop-in from [dingo-d/wp-sqlite-db](https://github.com/dingo-d/wp-sqlite-db), a fork of the original [aaemnnosttv/wp-sqlite-db](https://github.com/aaemnnosttv/wp-sqlite-db) by Evan Mattson), and a base test class from [Yoast/wp-test-utils](https://github.com/Yoast/wp-test-utils). All that combined allows you to run integration tests in WordPress with Pest PHP without any additional setup.
 
 ## Running unit tests alongside integration tests
 
@@ -150,9 +150,24 @@ If you want to run the package as a part of your continuous integration (CI) pip
 ### Why such a high PHP version? What if I need to test my theme/plugin on other PHP versions?
 
 Underlying aim of this package (besides getting WordPress developers more acquainted to testing) is to urge the developers to update their projects, and use more modern PHP features. 
-While WordPress supports PHP 5.6, it's no longer even supported with security patches (at the time of writing this PHP 7.4 is in the [EOL phase](https://www.php.net/supported-versions.php)).
+While WordPress still supports old PHP versions, they are no longer supported with security patches (at the time of writing this everything below PHP 8.2 is in the [EOL phase](https://www.php.net/supported-versions.php)). For that reason the package requires PHP 8.2 or higher.
 
 The WordPress community needs to move on, and if this package will help somebody to update their servers and PHP version I'll call that a success.
+
+### I'm on PHP 8.4 or 8.5 and running the tests throws a deprecation error
+
+The package pins Pest to `^1`, because that is the only Pest line that can boot the WordPress
+integration test suite (WordPress core, `wp-test-utils` and the PHPUnit Polyfills are still
+capped at PHPUnit 9 — see [Trac #62004](https://core.trac.wordpress.org/ticket/62004)). Pest 1
+emits "implicitly nullable parameter" deprecations on PHP 8.4+, and Collision escalates them
+to a fatal on boot.
+
+The scaffolded `phpunit.xml` already silences deprecations during the test run. If you run
+Pest directly on PHP 8.4/8.5, invoke it with deprecations disabled so it can boot:
+
+```bash
+php -d error_reporting="E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED" vendor/bin/pest
+```
 
 ### The script is stuck on Download WordPress part, what do I do?
 
