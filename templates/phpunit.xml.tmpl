@@ -13,6 +13,7 @@
 		</testsuite>
 	</testsuites>
 	<php>
+		<ini name="error_reporting" value="E_ALL &amp; ~E_DEPRECATED &amp; ~E_USER_DEPRECATED" />
 		<env name="TEST" value="true" force="true" />
 		<env name="WP_TESTS_DIR" value="wp/tests/phpunit"/>
 		<server name="DB_NAME" value="wp_pest_test_db"/>
