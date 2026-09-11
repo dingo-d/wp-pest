@@ -20,8 +20,8 @@
 	<exclude-pattern>*/wp-content/*</exclude-pattern>
 	<exclude-pattern>*/wp/*</exclude-pattern>
 
-	<!-- Check for cross-version support for PHP 7.4 and higher. -->
-	<config name="testVersion" value="7.4-"/>
+	<!-- Check for cross-version support for PHP 8.2 and higher. -->
+	<config name="testVersion" value="8.2-"/>
 	<rule ref="PHPCompatibility"/>
 
 	<!-- Apply PSR12 coding standards across the repo. -->
