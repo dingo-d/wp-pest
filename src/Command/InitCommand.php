@@ -143,6 +143,15 @@ class InitCommand extends Command
 	private ClientInterface $client;
 
 	/**
+	 * Cached WordPress develop tags
+	 *
+	 * @since 1.8.0
+	 *
+	 * @var list<string>|null Parsed version tags, or null when they haven't been fetched yet.
+	 */
+	private ?array $tagsCache = null;
+
+	/**
 	 * Command class constructor
 	 *
 	 * @since 1.0.0
@@ -563,11 +572,8 @@ class InitCommand extends Command
 	 */
 	private function getGitHubTags(): array
 	{
-		/** @var list<string>|null $cache */
-		static $cache = null;
-
-		if ($cache !== null) {
-			return $cache;
+		if ($this->tagsCache !== null) {
+			return $this->tagsCache;
 		}
 
 		$response = $this->client->request(
@@ -606,7 +612,7 @@ class InitCommand extends Command
 			$versions[] = $matchNumber[0][0] ?? '';
 		}
 
-		$cache = $versions;
+		$this->tagsCache = $versions;
 
 		return $versions;
 	}
