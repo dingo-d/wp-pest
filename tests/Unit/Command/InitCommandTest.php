@@ -5,12 +5,13 @@ namespace MadeByDenis\WpPestIntegrationTestSetup\Tests\Unit\Command;
 use Brain\Monkey;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use MadeByDenis\WpPestIntegrationTestSetup\Command\InitCommand;
 use MadeByDenis\WpPestIntegrationTestSetup\Tests\Mocks\CustomMockHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Console\Test\TestCommand;
 
-use function MadeByDenis\WpPestIntegrationTestSetup\Tests\{deleteOutputDir, mock};
+use function MadeByDenis\WpPestIntegrationTestSetup\Tests\{clientReturning, deleteOutputDir, mock};
 
 beforeEach(function () {
 	Monkey\setUp();
@@ -257,6 +258,66 @@ it("checks that attempting to download WordPress version will work", function ($
 	'',
 	'6.1.1'
 ]);
+
+it('returns no tags when the GitHub tags API responds with a non-2xx status', function () {
+	$command = new InitCommand(
+		$this->outputDir,
+		$this->fileSystem,
+		clientReturning(new Response(404, [], 'Not found'), new Response(404, [], 'Not found'))
+	);
+
+	TestCommand::for($command)
+		->addArgument('theme')
+		->addOption('--wp-version', '6.1.1')
+		->execute()
+		->assertStatusCode(1)
+		->assertOutputContains('Wrong WordPress version. Make sure the version number is correct.');
+});
+
+it('returns no tags when the GitHub tags API body is not a JSON array', function () {
+	$command = new InitCommand(
+		$this->outputDir,
+		$this->fileSystem,
+		clientReturning(new Response(200, [], 'null'), new Response(200, [], 'null'))
+	);
+
+	TestCommand::for($command)
+		->addArgument('theme')
+		->addOption('--wp-version', '6.1.1')
+		->execute()
+		->assertStatusCode(1)
+		->assertOutputContains('Wrong WordPress version. Make sure the version number is correct.');
+});
+
+it('skips tag entries that are not arrays', function () {
+	$command = new InitCommand(
+		$this->outputDir,
+		$this->fileSystem,
+		clientReturning(new Response(200, [], '["not-an-array"]'), new Response(200, [], '["not-an-array"]'))
+	);
+
+	TestCommand::for($command)
+		->addArgument('theme')
+		->addOption('--wp-version', '6.1.1')
+		->execute()
+		->assertStatusCode(1)
+		->assertOutputContains('Wrong WordPress version. Make sure the version number is correct.');
+});
+
+it('skips tag entries whose ref is not a string', function () {
+	$command = new InitCommand(
+		$this->outputDir,
+		$this->fileSystem,
+		clientReturning(new Response(200, [], '[{"ref": 123}]'), new Response(200, [], '[{"ref": 123}]'))
+	);
+
+	TestCommand::for($command)
+		->addArgument('theme')
+		->addOption('--wp-version', '6.1.1')
+		->execute()
+		->assertStatusCode(1)
+		->assertOutputContains('Wrong WordPress version. Make sure the version number is correct.');
+});
 
 it('checks that the database dropin is copied over correctly', function () {
 	$ds = DIRECTORY_SEPARATOR;

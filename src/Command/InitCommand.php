@@ -17,6 +17,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,6 +35,7 @@ use ZipArchive;
  *
  * @since 1.0.0
  */
+#[AsCommand(name: 'setup')]
 class InitCommand extends Command
 {
 	/**
@@ -141,13 +143,13 @@ class InitCommand extends Command
 	private ClientInterface $client;
 
 	/**
-	 * Command name property
+	 * Cached WordPress develop tags
 	 *
-	 * @since 1.0.0
+	 * @since 1.8.0
 	 *
-	 * @var string Command name.
+	 * @var list<string>|null Parsed version tags, or null when they haven't been fetched yet.
 	 */
-	protected static $defaultName = 'setup';
+	private ?array $tagsCache = null;
 
 	/**
 	 * Command class constructor
@@ -274,7 +276,6 @@ class InitCommand extends Command
 			if (!$this->filesystem->exists($testsDir)) {
 				$pluginSlug = $projectType === 'plugin' ? $pluginSlug : '';
 
-				// @phpstan-ignore-next-line
 				$this->setUpBasicTestFiles($testsDir, $projectType, $pluginSlug);
 
 				$io->success('Folder and files created successfully.');
@@ -571,34 +572,47 @@ class InitCommand extends Command
 	 */
 	private function getGitHubTags(): array
 	{
-		static $versions;
+		if ($this->tagsCache !== null) {
+			return $this->tagsCache;
+		}
 
-		if (empty($versions)) {
-			$response = $this->client->request(
-				'GET',
-				self::WP_API_TAGS,
-				[
-					'Accept' => 'application/vnd.github.v3+json'
-				]
-			);
-			if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-				return [];
+		$response = $this->client->request(
+			'GET',
+			self::WP_API_TAGS,
+			[
+				'Accept' => 'application/vnd.github.v3+json'
+			]
+		);
+		if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+			return [];
+		}
+
+		$contents = $response->getBody()->getContents();
+
+		$refArray = json_decode($contents, true);
+
+		if (!is_array($refArray)) {
+			return [];
+		}
+
+		$versions = [];
+
+		foreach ($refArray as $refInfo) {
+			if (!is_array($refInfo)) {
+				continue;
 			}
 
-			$contents = $response->getBody()->getContents();
+			$reference = $refInfo['ref'] ?? '';
 
-			$refArray = (array) json_decode($contents, true);
+			if (!is_string($reference)) {
+				continue;
+			}
 
-			$versions = array_map(static function ($refInfo) {
-				if (!is_array($refInfo)) {
-					return '';
-				}
-
-				$reference = $refInfo['ref'] ?? '';
-				preg_match_all('/[\d.]*$/', $reference, $matchNumber, PREG_SET_ORDER);
-				return $matchNumber[0][0] ?? '';
-			}, $refArray);
+			preg_match_all('/[\d.]*$/', $reference, $matchNumber, PREG_SET_ORDER);
+			$versions[] = $matchNumber[0][0] ?? '';
 		}
+
+		$this->tagsCache = $versions;
 
 		return $versions;
 	}

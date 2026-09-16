@@ -11,6 +11,10 @@
 namespace MadeByDenis\WpPestIntegrationTestSetup\Tests;
 
 use FilesystemIterator;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Mockery;
 use Mockery\MockInterface;
 use Mockery\LegacyMockInterface;
@@ -54,4 +58,26 @@ function deleteOutputDir(string $dir = ''): void
 	$fs = new Filesystem();
 
 	$fs->remove($dir);
+}
+
+/**
+ * Build a Guzzle client that returns the given queued responses
+ *
+ * The tags endpoint is requested more than once per command run (once while
+ * downloading and once while validating the version), so error-path tests queue
+ * the same response twice. `http_errors` is disabled so that non-2xx responses
+ * are returned to the caller instead of throwing, exercising the status guard.
+ *
+ * @param Response ...$responses Responses to return in order.
+ *
+ * @since 1.8.0
+ *
+ * @return Client
+ */
+function clientReturning(Response ...$responses): Client
+{
+	return new Client([
+		'handler' => HandlerStack::create(new MockHandler($responses)),
+		'http_errors' => false,
+	]);
 }
