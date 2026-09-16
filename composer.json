@@ -62,7 +62,7 @@
     "test:types": "@php ./vendor/bin/phpstan",
     "test:style": "@php ./vendor/bin/phpcs",
     "test:unit": "@php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" ./vendor/bin/pest",
-    "test:coverage": "@php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" ./vendor/bin/pest --coverage",
+    "test:coverage": "@php -dxdebug.mode=coverage -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" ./vendor/bin/pest --coverage",
     "test": [
       "@test:style",
       "@test:types",
